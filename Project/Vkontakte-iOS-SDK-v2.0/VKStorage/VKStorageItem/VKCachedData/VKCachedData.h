@@ -2,35 +2,35 @@
 // Created by AndrewShmig on 6/28/13.
 //
 // Copyright (c) 2013 Andrew Shmig
-// 
-// Permission is hereby granted, free of charge, to any person 
-// obtaining a copy of this software and associated documentation 
-// files (the "Software"), to deal in the Software without 
-// restriction, including without limitation the rights to use, 
-// copy, modify, merge, publish, distribute, sublicense, and/or 
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or
 // sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following 
+// Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-// FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+// FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
 #import <Foundation/Foundation.h>
 
-/** Перечисление возможных сроков действия кэша.
-*/
+/** List of the possible cache expiration times
+ */
 typedef enum
 {
-
+    
     VKCachedDataLiveTimeNever = 0,
     VKCachedDataLiveTimeOneMinute = 60,
     VKCachedDataLiveTimeThreeMinutes = 3 * 60,
@@ -41,91 +41,84 @@ typedef enum
     VKCachedDataLiveTimeOneWeek = 7 * 24 * 60 * 60,
     VKCachedDataLiveTimeOneMonth = 30 * 24 * 60 * 60,
     VKCachedDataLiveTimeOneYear = 365 * 24 * 60 * 60,
-
+    
 } VKCachedDataLiveTime;
 
-/** Класс предназначен для хранения, получения, удаления кэша запросов.
-Хранение кэша осуществляется на диске и в директории указанной при инициализации
-класса.
-*/
+/** This interface is intended for storing, retrieving and removing cache requests.
+ Data will be stored on local drive and in the directory set during initialization process
+ */
+
 @interface VKCachedData : NSObject
 
 /**
-@name Методы инициализации
-*/
-/** Инициализация объекта для кэширования запросов
-
-@param path директория в которой должны будут храниться кэшируемые данные.
-Если директория не существует, то будет создана.
-@return объект типа VKCachedData
-*/
+ @name Initialization methods
+ */
+/** Object initialization method
+ 
+ @param path directory where cached data will be stored. If directory does not exist, it will be created
+ @return VKCachedData instance
+ */
 - (instancetype)initWithCacheDirectory:(NSString *)path;
 
 /**
-@name Методы манипуляции с кэшем
-*/
-/** Добавляет данные в кэш
-
-По умолчанию время жизни кэша устанавливается равным одному часу.
-
-@param cache данные, которые необходимо закэшировать
-@param url URL который соответствует кешируемым данным
-*/
+ @name Cache management methods
+ */
+/** Add data in cache
+ Default TTL is one hour
+ 
+ @param cache data to be cached
+ @param url url which matches to cached data
+ */
 - (void)addCachedData:(NSData *)cache forURL:(NSURL *)url;
 
-/** Добавляет данные в кэш
-
-@param cache данные, которые необходимо закэшировать
-@param url URL который соответствует кешируемым данным
-@param cacheLiveTime время жизни кэша. Возможные варианты перечислены в VKCachedDataLiveTime
-(VKCachedDataLiveTimeOneHour, VKCachedDataLiveTimeOneDay, VKCachedDataLiveTimeForever etc)
-*/
+/** Add data in cache
+ 
+ @param cache data to be cached
+ @param url url which matches to cached data
+ @param cacheLiveTime cache ttl value. Possible options can be found in VKCachedDataLiveTime interface
+ (VKCachedDataLiveTimeOneHour, VKCachedDataLiveTimeOneDay, VKCachedDataLiveTimeForever, etc.)
+ */
 - (void)addCachedData:(NSData *)cache
                forURL:(NSURL *)url
              liveTime:(VKCachedDataLiveTime)cacheLiveTime;
 
-/** Удаление кэша указанного URL
-
-@param url URL, закэшированные данные которого необходимо удалить
-*/
+/** Remove data from cache that is associated with passed url
+ 
+ @param url url which matches to cached data
+ */
 - (void)removeCachedDataForURL:(NSURL *)url;
 
-/** Удаление всех закэшированных данных в директории, которой был инициализирован
-данный объект
-*/
+/** Remove all cached data from the current objects instance directory
+ */
 - (void)clearCachedData;
 
-/** Удаление директории с данными кэша
-*/
+/** Remove current objects directory and all cached data inside
+ */
 - (void)removeCachedDataDirectory;
 
 /**
-@name Получение закэшированных данных
-*/
-/** Возвращает закэшированные данные по указанному URL, либо nil, если время действия
-кэша истекло или его нет.
-
-@param url URL, закэшированные данные по которому необходимо получить
-@return экземпляр класса NSData, закэшированные данные указанного URL
-*/
+ @name Cached data retrieval methods
+ */
+/** Retrieve cached data which matches to passed url.
+ If associated item does not exist nil will be returned
+ 
+ @param url url which matches to cached data
+ @return NSData instance
+ */
 - (NSData *)cachedDataForURL:(NSURL *)url;
 
-/** Возвращает закэшированные данные по указанному URL, либо nil, если для данного
-запроса нет кэша.
-
-Параметр offlineMode влияет на возвращаемые данные следующим образом: если передается
-YES и в кэше есть данные для этого URL, но срок их жизни истек, то они всё равно
-будут возвращены (без удаления, до последующего обновления).
-Если параметр offlineMode равен NO, то при запросе данных из кэша, они будут
-удалены в случае, если время жизни данных истекло.
-
-Использование данного метода с передачей значения YES в параметре offlineMode
-полезно при отсутствии интернет соединения.
-
-@param url URL, закэшированные данные по которому необходимо получить
-@param offlineMode оффлайн режим запроса кэша (как работает описано в Обсуждении)
-@return экземпляр класса NSData, закэшированные данные указанного URL
-*/
+/** Retrieve cached data which matches to passed url.
+ If associated item does not exist nil will be returned
+ 
+ If offlineMode is passed as "YES" the data will be returned from the cache even if it's expired.
+ If offlineMode is equal to "NO" the cached item will be deleted if it's expired
+ 
+ The offlineMode parameter is useful when there is no internet connection
+ 
+ @param url url which matches to cached data
+ @param offlineMode cache access offline mode
+ @return NSData instance
+ */
 - (NSData *)cachedDataForURL:(NSURL *)url
                  offlineMode:(BOOL)offlineMode;
 

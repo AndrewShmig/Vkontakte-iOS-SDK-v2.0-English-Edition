@@ -39,8 +39,8 @@
 @class VKStorageItem;
 
 
-/** Протокол объявляет методы отслеживания изменения статуса токена доступа
- хранимого классом VKConnector.
+/** This protocol defines callback methods for tracking access token
+ status updates. Access token is being stored in VKConnector class.
  */
 @protocol VKConnectorDelegate <NSObject>
 
@@ -48,18 +48,18 @@
 /**
  @name Modal view
  */
-/** Метод вызывается до того, как произойдет отображение модального окна авторизации
+/** This callback will be executed before authorization modal window is shown
  
- @param connector объект класса VKConnector отправляющий сообщение
- @param view модальное окно
+ @param connector instance of VKConnector class which will send a message
+ @param view modal window
  */
 - (void)VKConnector:(VKConnector *)connector
   willShowModalView:(VKModal *)view;
 
-/** Метод вызывается до того, как произойдет скрытие модального окна авторизации
+/** This callback will be executed before authorization modal window is hidden
  
- @param connector объект класса VKConnector отправляющий сообщение
- @param view модальное окно
+ @param connector instance of VKConnector class which will send a message
+ @param view modal window
  */
 - (void)VKConnector:(VKConnector *)connector
   willHideModalView:(VKModal *)view;
@@ -67,30 +67,27 @@
 /**
  @name Access token
  */
-/** Метод, вызов которого сигнализирует о том, что токен стал недействительным,
- срок его действия истёк.
+/** This callback will be executed when access token expires
  
- @param connector объект класса VKConnector отправляющий сообщение.
- @param accessToken токен доступа, срок действия которого истёк.
+ @param connector instance of VKConnector class which will send a message
+ @param accessToken expired access token
  */
 - (void)   VKConnector:(VKConnector *)connector
 accessTokenInvalidated:(VKAccessToken *)accessToken;
 
-/** Метод, вызов которого сигнализирует о том, что токен доступа успешно обновлён.
+/** This callback will be executed after successful access token renewal
  
- @param connector объект класса VKConnector отправляющий сообщение.
- @param accessToken новый токен доступа, который был получен.
+ @param connector instance of VKConnector class which will send a message
+ @param accessToken renewed access token
  */
 - (void)        VKConnector:(VKConnector *)connector
 accessTokenRenewalSucceeded:(VKAccessToken *)accessToken;
 
-/** Метод, вызов которого сигнализирует о том, что обновление токена доступа не
- удалось.
- Причиной ошибки может быть прерывание связи, либо пользователь отказался авторизовывать
- приложение.
+/** This callback will be executed if a token update was not successful.
+ It is possible that internet connection was lost or user denied authorizing application
  
- @param connector объект класса VKConnector отправляющего сообщение.
- @param accessToken токен доступа (равен nil)
+ @param connector instance of VKConnector class which will send a message
+ @param accessToken access token will be equal to nil
  */
 - (void)     VKConnector:(VKConnector *)connector
 accessTokenRenewalFailed:(VKAccessToken *)accessToken;
@@ -98,78 +95,79 @@ accessTokenRenewalFailed:(VKAccessToken *)accessToken;
 /**
  @name Connection & Parsing
  */
-/** Метод, вызов которого сигнализирует о том, что произошла ошибка соединения при попытке осуществить запрос
+/** This callback will be executed if a connection problem occurs during a request
  
- @param connector объект класса VKConnector отправляющего сообщение
- @param error объект ошибки содержащий описание причины возникновения ошибки
+ @param connector instance of VKConnector class which will send a message
+ @param error object with errors description
  */
 - (void)   VKConnector:(VKConnector *)connector
 connectionErrorOccured:(NSError *)error;
 
-/** Метод, вызов которого сигнализирует о том, что произошла ошибка при парсинге JSON ответа сервера
+/** This callback will be executed if there is an invalid json response
  
- @param connector объект класса VKConnector отправляющего сообщение
- @param error объект ошибки содержащий описание причины возникновения ошибки
+ @param connector instance of VKConnector class which will send a message
+ @param error object with errors description
  */
 - (void)VKConnector:(VKConnector *)connector
 parsingErrorOccured:(NSError *)error;
 
 @end
 
-
-/** Класс предназначен для получения приложением доступа к пользовательской учетной
- записи и осуществления запросов к API сервиса методами GET/POST.
-
-    - (void)applicationDidFinishLaunching:(UIApplication *)application
-    {
-        [[VKConnector sharedInstance] startWithAppID:@"YOUR_APP_ID"
-                                          permissons:@[@"friends",@"wall"]];
-    }
-
+/** This interface is intended for retrieving user profile access token and
+ issuing requests for VK API using GET/POST methods 
+ 
+ - (void)applicationDidFinishLaunching:(UIApplication *)application
+ {
+    [[VKConnector sharedInstance] startWithAppID:@"YOUR_APP_ID"
+                                    permissons:@[@"friends",@"wall"]];
+ }
  */
 @interface VKConnector : NSObject <UIWebViewDelegate, KGModalDelegate>
 
 /**
-@name Свойства
-*/
-/** Делегат VKConnector
+ @name Properties
+ */
+/** VKConnector delegate
+ 
+ @see https://en.wikipedia.org/wiki/Delegation_pattern
  */
 @property (nonatomic, weak, readwrite) id <VKConnectorDelegate> delegate;
 
-/** Идентификатор приложения Вконтакте
+/** VKontakte application identifier generated during registration process
  */
 @property (nonatomic, strong, readonly) NSString *appID;
 
-/** Список разрешений
+/** Permissions list
  */
 @property (nonatomic, strong, readonly) NSArray *permissions;
 
 /**
-@name Методы класса
-*/
-/** Метод класса для получения экземпляра сиглтона.
-* Если объект отсутствует, то он будет создан. Не может быть равен nil или NULL.
-*/
+ @name Methods
+ */
+/** Class methods for retrieving singleton instance
+ If onject is missing it will be created.
+ */
 + (id)sharedInstance;
 
 /**
-@name Авторизация пользователем приложения
-*/
-/** Инициализирует запуск коннектора с заданными параметрами
-
- @param appID Идентификатор приложения полученный при регистрации.
- @param permissions Массив доступов (разрешений), которые необходимо получить приложению.
+ @name User authorization for application
+ */
+/** Initializes connection with passed parameters
+ 
+ @param appID VKontakte application identifier generated during registration process
+ @param permissions Array with permission flags that the application needs to request
  */
 - (void)startWithAppID:(NSString *)appID
             permissons:(NSArray *)permissions;
 
 /**
-@name Манипулирование куками авторизации
-*/
-/** Удаляет куки, которые были получены при авторизации последним пользователем приложения.
-Может понадобиться в случае, если вы хотите, чтобы пользователь мог использовать
-несколько своих учетных записей социальной сети или для авторизации другого пользователя.
-*/
+ @name Authorization cookies management methods
+ */
+/** Removes cookies that are received during the authorization process of the last application user.
+ Might be needed if the user wants to use different profiles or for authorization of a different person.
+ 
+ tip: UIWebView saves authorization cookies
+ */
 - (void)clearCookies;
 
 @end
