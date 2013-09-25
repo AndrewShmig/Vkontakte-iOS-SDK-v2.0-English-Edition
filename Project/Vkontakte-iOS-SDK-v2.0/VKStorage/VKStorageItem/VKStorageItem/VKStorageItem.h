@@ -30,29 +30,31 @@
 @class VKAccessToken;
 @class VKCachedData;
 
-/** Класс представляет собой элемент хранилища VKStorage.
-*/
+/** Storage element
+ */
 @interface VKStorageItem : NSObject
 
 /**
-@name Свойства
+@name Properties
 */
-/** Токен доступа
+/** Access token
 */
 @property (nonatomic, strong, readonly) VKAccessToken *accessToken;
 
-/** Кэш запросов
+/** Requests cache storage
 */
 @property (nonatomic, strong, readonly) VKCachedData *cachedData;
 
 /**
-@name Методы инициализации
+@name Initialization methods
 */
-/** Инициализация элемента хранилища токеном доступа и директорией кэша
-@param token токен доступа с которым будет ассоциироваться элемент хранилища
-@param path путь к директории в которой необходимо хранить кэш запросов
-@return экземпляр класс VKStorageItem
-*/
+/** Initialize storage element with access token and requests cache storage path
+ 
+ @param token access token which will be associated with the storage element
+ @param path path to the requested cache directory
+ 
+ @return Instance of VKStorageItem
+ */
 - (instancetype)initWithAccessToken:(VKAccessToken *)token
                     mainCacheStoragePath:(NSString *)path;
 

@@ -30,77 +30,65 @@
 
 
 /**
- Класс содержит информацию о пользовательском токене доступа.
-
- Кроме самого токена доступа хранится следующая информация:
-
- - список прав к которым есть доступ приложения (offline, photo, docs, friends, ex и др)
- - срок истечения действия токена
- - пользовательский идентификатор в социальной сети ВКонтакте
- - токен доступа
+ This interface contains data about user access token. It also stores
+ access rights (offline, photo, docs, etc.), token expiration date
+ and user id in VKontakte network
  */
 
 @interface VKAccessToken : NSObject <NSCopying, NSCoding>
 
 /**
- @name Свойства
+ @name Properties
  */
-
 /**
- Массив пользовательских разрешений к которым был получен доступ приложением
+ Array with access rights granted
  */
 @property (nonatomic, copy, readonly) NSArray *permissions;
 
 /**
-Время создания токена
-*/
+ Access token creation time
+ */
 @property (nonatomic, assign, readonly) NSTimeInterval creationTime;
 
 /**
- Время жизни токена доступа.
+ Access token TTL
  */
 @property (nonatomic, assign, readonly) NSTimeInterval liveTime;
 
 /**
- Пользовательский идентификатор в социальной сети ВКонтакте.
+ User id in VKontakte network
  */
 @property (nonatomic, assign, readonly) NSUInteger userID;
 
 /**
- Токен доступа.
+ Access token
  */
 @property (nonatomic, copy, readonly) NSString *token;
 
 /**
- Истекло ли время действия текущего токена доступа или нет.
- NO - если токен всё еще действует, иначе - YES.
-
- NO в следующих случаях:
-
- - Время истечения токена больше нуля и больше текущего времени.
- - Время истечения токена равно нулю и в списке доступов присутствует "offline" доступ
-
+ Is access token expired
+ 
+ Also NO will be returned if "offline" access has been granted to the application
  */
 @property (nonatomic, readonly) BOOL isExpired;
 
-/** Действителен ли токен.
-
- Возвращает YES, если токен неравен nil и срок его действия не истек.
+/** Is token valid
+ 
+ Returns YES if token is not empty and not expired
  */
 @property (nonatomic, readonly) BOOL isValid;
 
 /**
- @name Методы инициализации
+ @name Initialization methods
  */
-
 /**
- Основной метод инициализации.
-
- @param userID Пользовательский идентификатор в социальной сети ВКонтакте.
- @param token Токен доступа.
- @param liveTime Время жизни токена доступа.
- @param permissions Список полученных приложением прав.
- @return Объект VKAccessToken класса.
+ Main initialization method
+ 
+ @param userID user id in VKontakte network.
+ @param token access token
+ @param liveTime access token ttl
+ @param permissions list of granted permissions
+ @return VKAccessToken instance
  */
 - (instancetype)initWithUserID:(NSUInteger)userID
                    accessToken:(NSString *)token
@@ -108,63 +96,61 @@
                    permissions:(NSArray *)permissions;
 
 /**
- Вторичный метод инициализации класса.
-
- permissions принимает значение по умолчанию  @[].
-
+ Secondary initialization method
+ 
+ permissions will be equal to  @[]
+ 
  @see initWithUserID:accessToken:liveTime:permissions:
-
- @param userID Пользовательский идентификатор в социальной сети ВКонтакте.
- @param token Токен доступа.
- @param liveTime Время жизни токена доступа.
- @return Объект VKAccessToken класса.
+ 
+ @param userID user id in VKontakte network.
+ @param token access token
+ @param liveTime access token ttl
+ @return VKAccessToken instance
  */
 - (instancetype)initWithUserID:(NSUInteger)userID
                    accessToken:(NSString *)token
                       liveTime:(NSTimeInterval)liveTime;
 
 /**
-Вторичный метод инициализации класса.
-
- permissions принимает значение по умолчанию @[].
-
- liveTime принимает значение по умолчанию 0.
-
+ Secondary initialization method
+ 
+ permissions will be equal to @[]
+ liveTime will be equal to 0
+ 
  @see initWithUserID:accessToken:liveTime:permissions:
-
- @param userID Пользовательский идентификатор в социальной сети ВКонтакте
- @param token Токен доступа.
- @return Объект VKAccessToken класса.
+ 
+ @param userID user id in VKontakte network.
+ @param token access token
+ @return VKAccessToken instance
  */
 - (instancetype)initWithUserID:(NSUInteger)userID
                    accessToken:(NSString *)token;
 
 /**
- @name Перегруженные методы
+ @name Overloaded methods
  */
 /**
- Описание состояния класса VKAccessToken.
-
- @return Строковое представление текущего класса.
+ Describes VKAccessToken instance state
+ 
+ @return A string representation of the current instance
  */
 - (NSString *)description;
 
-/** Проверяет токены доступов на равенство
-@param token токен доступа с которым необходимо сравнить
-@return YES - если токены доступа равны (на результат сравнения влияет только сам
-токен доступа, список пользовательских разрешений и идентификатор пользователя, которому
-принадлежит данный токен)
-*/
+/** Compares VKAccessTokens
+ 
+ @param token access token which current instance will be compared to
+ @return YES if tokens equal (assert the equality of tokens, list of granted accesses and user id)
+ */
 - (BOOL)isEqual:(VKAccessToken *)token;
 
 /**
- @name Публичные методы
+ @name Public methods
  */
 /**
- Метод проверяет наличие определенного доступа в общем списке доступов данного токена.
-
- @param permission Наименование доступа.
- @return YES - если такое право присутствует в общем списке, иначе - NO.
+ Checks if permission has been granted
+ 
+ @param permission permission name
+ @return YES if permission was granted, otherwise NO
  */
 - (BOOL)hasPermission:(NSString *)permission;
 
