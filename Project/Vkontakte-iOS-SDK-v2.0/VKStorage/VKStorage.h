@@ -29,16 +29,24 @@
 /** Основной ключ используемый для хранения информации о токенах доступа содержащихся
 в хранилище.
 */
+/** Main key which is used for storing access tokens information in local storage
+ */
 static NSString *const kVKStorageUserDefaultsKey = @"Vkontakte-iOS-SDK-v2.0-Storage";
 
 /** Основная директория для хранения файловых данных используемая в SDK (полный путь представляет
 собой конкатенацию директории NSCachesDirectory и этой константы)
 */
+/** Main directory which is used for storing file data used by SDK (full path is a concatenation
+ of NSCachesDirectory and this constant)
+ */
 static NSString *const kVKStoragePath = @"/Vkontakte-iOS-SDK-v2.0-Storage/";
 
 /** Основная директория для хранения кэша данных используемая в SDK (полный путь представляет
 собой конкатенацию директории NSCachesDirectory и этой констаны)
 */
+/** Main directory which is used for storing cache data used by SDK (full path is a concateration
+ of NSCachesDirectory and this constant)
+ */
 static NSString *const kVKStorageCachePath = @"/Vkontakte-iOS-SDK-v2.0-Storage/Cache/";
 
 
@@ -50,82 +58,85 @@ static NSString *const kVKStorageCachePath = @"/Vkontakte-iOS-SDK-v2.0-Storage/C
 Основным хранимым элементом является элемент типа VKStorageItem, который содержит
 пользовательский токен доступа и связанную с ним директорию для кэша.
 */
+/** Interface provides access to local storage for user access tokens and cached data. The main stored
+ element is the VKStorageItem instance, which contains access token and the associated cache directory
+ */
 @interface VKStorage : NSObject
 
 /**
-@name Свойства
+@name Properties
 */
-/** Является ли хранилище пустым
+/** Is local storage empty
 */
 @property (nonatomic, readonly) BOOL isEmpty;
 
-/** Кол-во элементов находящихся в хранилище
+/** Number of elements currently saved in storage
 */
 @property (nonatomic, readonly) NSUInteger count;
 
-/** Полный путь к основной директории хранилища
-*/
+/** Full path to the main storage folder
+ */
 @property (nonatomic, readonly) NSString *fullStoragePath;
 
-/** Полный путь к основной директории кэша хранилища
+/** Full path to the main storage cache folder
 */
 @property (nonatomic, readonly) NSString *fullCacheStoragePath;
 
 /**
-@name Инициализация
+@name Instance initialization
 */
-/** Общее хранилище
+/** Shared storage
 
-@return экземпляр класс VKStorage
+@return VKStorage instance
 */
 + (instancetype)sharedStorage;
 
 /**
-@name Создание элементов хранилища
-*/
-/** Создаёт элемент хранилища
+ @name Create storage elements
+ */
+/** Create storage element
 
-@param token пользовательский токен доступа для которого будет создан элемент хранилища
-@return экземпляр класс VKStorageItem
+ @param token user access token for which storage item will be created
+ @return VKStorageItem instance
 */
 - (VKStorageItem *)createStorageItemForAccessToken:(VKAccessToken *)token;
 
 /**
-@name Манипулирование данными хранилища
+@name Manipulate with storage data
 */
-/** Добавляет в хранилище новый элемент
+/** Add a new element in the storage
 
-@param item элемент хранилища
+@param item storage item
 */
 - (void)addItem:(VKStorageItem *)item;
 
-/** Удаляет из хранилища указанный элемент
+/** Remove an element from the storage
 
-@param item элемент хранилища
+@param item storage element
 */
 - (void)removeItem:(VKStorageItem *)item;
 
-/** Удаляет все данные из хранилища.
+/** Remove all data from the storage
 */
 - (void)clean;
 
-/** Удаляет все данные кэша в хранилище
+/** Remove all data from the storage cache
 */
 - (void)cleanCachedData;
 
 /**
-@name Чтение элементов хранилища
+ @name Read storage data
 */
-/** Получение элемента хранилища по пользовательскому идентификатору
-
-@param userID пользовательский идентификатор
-@return экземпляр класса VKStorageItem, либо nil, если элемента в хранилище
-*/
+/** Retrieve an element from the storage by userID
+ 
+ @param userID user identification
+ @return instance of VKStorageItem or nil if there is no element in storage
+ */
 - (VKStorageItem *)storageItemForUserID:(NSUInteger)userID;
 
-/** Список всех элементов хранилища
+/** List of all elements in storage
 
-@return массив со всеми элементами хранилища типа VKStorageItem
+ @return Array with all VKStorageItem elements in storage
 */
 - (NSArray *)storageItems;
 

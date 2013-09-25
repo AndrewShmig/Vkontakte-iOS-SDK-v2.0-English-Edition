@@ -2,26 +2,26 @@
 // Created by AndrewShmig on 6/28/13.
 //
 // Copyright (c) 2013 Andrew Shmig
-// 
-// Permission is hereby granted, free of charge, to any person 
-// obtaining a copy of this software and associated documentation 
-// files (the "Software"), to deal in the Software without 
-// restriction, including without limitation the rights to use, 
-// copy, modify, merge, publish, distribute, sublicense, and/or 
+//
+// Permission is hereby granted, free of charge, to any person
+// obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or
 // sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following 
+// Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-// FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+// FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
 #import <Foundation/Foundation.h>
@@ -32,178 +32,149 @@
 @class VKRequest;
 @protocol VKRequestDelegate;
 
-
 /**
- Класс представляет пользователя социальной сети, который может осуществлять ряд
- действий с объектами вроде групп, друзей, музыкой, видео и тд.
-
- Класс так же позволяет изменить текущего активного пользователя на одного из
- пользователей находящихся в хранилище (ранее авторизованных). Получить список
- пользователей, которые авторизовывались можно используя метод localUsers.
-
- @warning методы, которые требуют наличия access_token в запросе _перезаписывают_
- токен доступа, если таковой был указан при передаче словаря ключей-значений, на
- значение токена доступа текущего пользователя - self.accessToken.token.
-
- @warning по умолчанию у каждого запроса из класса VKUser подпись (signature)
- является строкой селектора инициировавшего/создавшего объекта запроса
+ This class represents VKontakte user, which can issue API requests like
+ manipulations with groups, friends, music, video, etc.
+ 
+ You can also switch between active users (users who had been authorized before). It
+ is easy to retreive this users list by calling localUsers method.
+ 
+ @warning methods, which require access_token will in request will override
+ access token to a current user access token value from self.accessToken.token
+ @warning by default each request signature from VKUser instance represents
+ a string of selector which initialized request
  */
 @interface VKUser : NSObject
 
 /**
-@name Свойства
-*/
-/** Делегат
-
-Решение использовать сильную ссылку на объект делегата в классе VKUser возникает
-при рассмотрении детально принципа работы запросов VKRequest.
-В VKRequest ссылка на делегат является слабой, а значит, если и в VKUser будет
-слабой, то вполне может случиться неприятность, когда будут запущено несколько
-запросов, а делегат в некоторый момент времени установлен в nil (случайно или
-намеренно), тогда получим пустые запросы результаты которых не нужны будут и не
-будут использованы.
-
-@warning возможно в будущем изменится обработка момента присвоения делегату
-значения nil, как вариант, все запущенные запросы будут отменены.
-*/
+ @name Properties
+ */
+/** VKRequest Delegate
+ */
 @property (nonatomic, strong, readwrite) id<VKRequestDelegate> delegate;
 
-/** Пользовательски токен доступа текущего активного пользователя
-*/
+/** Current active user's access token
+ */
 @property (nonatomic, readonly) VKAccessToken *accessToken;
 
-/** Начинать ли выполнение запросов немедленно или предоставить программисту
-самому выбирать момент запуска запроса.
-По умолчанию принимает значение YES.
-
-Предположим, что вы хотите осуществить запрос пользовательской информации, но
-начало хотите инициировать сами. Вот, как это может выглядеть:
-
-    [VKUser currentUser].startAllRequestsImmediately = NO;
-    VKRequest *userInfo = [[VKUser currentUser] info];
-
-    // пользователь нажал какую-то кнопку, после чего вы стартуете запрос
-    [userInfo start];
-
-Если нет необходимоти выполнять отложенный запуск, то можно делать следующим образом:
-
-    // запрос стартует немедленно
-    [[VKUser currentUser] info];
-
-*/
+/** Delayed request start, by default equals to YES.
+ 
+ For example you want to initialize something before request
+ [VKUser currentUser].startAllRequestsImmediately = NO;
+ VKRequest *userInfo = [[VKUser currentUser] info];
+ 
+ // ... Something happend
+ [userInfo start];
+ 
+ Otherwise if there is no need in delayed request start
+ [[VKUser currentUser] info];
+ */
 @property (nonatomic, assign, readwrite) BOOL startAllRequestsImmediately;
 
-/** Оффлайн режим. В данном режиме данные будут запрошены из кэша и возвращены
-даже в случае истечения срока их действия (удаления не произойдет).
-По умолчанию режим выключен.
-*/
+/** Offline mode. In this mode is enabled data will be returned from cache even if
+ it expired. By default this mode is turned off
+ */
 @property (nonatomic, assign, readwrite) BOOL offlineMode;
 
 /**
-@name Методы класса
-*/
-/** Текущий активный пользователь.
-
-Если хранилище не содержит авторизованных пользователей, то возвращено будет значение
-nil.
-
-В случае, если активным не был установлен какой-то определенный пользователь, то
-при вызове данного метода активируется произвольный пользователь из хранилища (если
-в хранилище будет находится лишь один пользователь, то именно он будет активирован
-и от его лица будут осуществляться дальнейшие запросы).
-
-_Вопрос:_ Когда может произойти подобная ситуация?
-
-_Ответ:_ Представим, что два и более пользователей подряд авторизовались и, во время
-авторизаций не было вызовов метода currentUser.
-
-Рассмотрим на примере:
-
-    // авторизовался пользователь А
-    // авторизовался пользователь Б
-    // авторизовался пользователь В
-    [VKUser currentUser] // будет активирован произвольный пользователь, либо А, либо Б, либо В
-
-Второй пример:
-
-    // авторизовался пользователь А
-    [VKUser currentUser] // активным устанавливается пользователь А
-    // авторизовался пользователь Б, но А по прежнему активный
-    // авторизовался пользователь В, но А по прежнему активный
-
-*/
+ @name Available methods
+ */
+/** Current active user
+ 
+ If there is no active users in the storage nil will be returned.
+ 
+ In case if there is no active user set, random user from the storage will be selected
+ and all requests will be issues on his behalf.
+ 
+ Q: When situation like this can appear?
+ A: For example two or more users authorized, however method currentUser was not executed.
+    // user A authorized
+    // user B authorized
+    // user C authorized
+    [VKUser currentUser] // random user will be activated, or A or B or c
+ 
+    Another example
+    // user A authorized
+    [VKUser currentUser] // user A will be set as active
+    // user B authorized, user A still active
+    // user C authorized, user A still active
+ */
 + (instancetype)currentUser;
 
-/** Делает активным пользователя с идентификатором userID.
-
-Если пользователя с таким идентификатором нет в хранилище, то метод вернет NO, иначе
-YES.
-
-@param userID идентификатор пользователя, которого необходимо активировать
-
-@return булево значение, удалось ли активировать указанного пользователя или нет
-*/
+/** Set user with user id as active
+ 
+ If user with user id does not exists in storage, than NO will be returned otherwise YES
+ 
+ @param userID user id
+ @return YES if user was activated, otherwise NO
+ */
 + (BOOL)activateUserWithID:(NSUInteger)userID;
 
-/** Получение списка пользователей находящихся в хранилище
-
-@return массив пользовательских идентификаторов
-*/
+/** Retreive a list of all available users in storage
+ 
+ @return Array with available user id's
+ */
 + (NSArray *)localUsers;
 
 /**
-@name Пользователи
-*/
-/** Информация о текущем пользователе.
-
-Следующие поля данных запрашиваются: nickname,screen_name,sex,bdate,has_mobile,online,last_seen,status,photo100
-
-Детальную информацию можно найти по этой ссылке в документации: https://vk.com/dev/users.get
-
-@return экземпляр класса VKRequest, который инкапсулирует в себе все необходимые параметры для
-осуществления запроса пользовательской информации. Объект запроса возвращается по причине
-возможной необходимости отменить выполнение текущего запроса или отложенное выполнение запроса.
-*/
+ @name Users
+ */
+/** Returns detailed information on current user
+ 
+ Following fiends will be requested: nickname,screen_name,sex,bdate,has_mobile,online,last_seen,status,photo100
+ 
+ @see https://vk.com/dev/users.get
+ 
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)info;
 
-/** Информация о пользователе(ях) с указанными параметрами
-
-Описание параметров и возможные значения можно найти по ссылке: https://vk.com/dev/users.get
-
-@param options ключи-значения, которые будут переданы при запросе методом GET
-@return @see info
-*/
+/** Information about user(s) with requested parameters
+ 
+ @see https://vk.com/dev/users.get
+ 
+ @param options parameters which will be requested
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)info:(NSDictionary *)options;
 
-/** Возвращает список пользователей в соответствии с заданным критерием поиска
-
-@param options ключи-значения, с полным списком ключей можно ознакомиться по
-ссылке из документации: https://vk.com/dev/users.search
-@return @see info
-*/
+/** Returns a list of users matching the search criteria
+ 
+ @see https://vk.com/dev/users.search
+ 
+ @param options search criteria fields
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)search:(NSDictionary *)options;
 
-/** Возвращает список идентификаторов пользователей и групп, которые входят в список подписок пользователя
-
-@param options ключи-значения, с полным списком ключей можно ознакомиться по
-ссылке из документации: https://vk.com/dev/users.getSubscriptions
-@return @see info
-*/
+/** Returns a list of IDs of users and communities followed by the user
+ 
+ @see https://vk.com/dev/users.getSubscriptions
+ 
+ @param options parameter fields
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)subscriptions:(NSDictionary *)options;
 
-/** Возвращает список идентификаторов пользователей, которые являются подписчиками пользователя. Идентификаторы пользователей в списке отсортированы в порядке убывания времени их добавления.
-
-@param options ключи-значения, с полным списком ключей можно ознакомиться по
-ссылке из документации: https://vk.com/dev/users.getFollowers
-@return @see info
-*/
+/** Returns a list of IDs of followers of the user in question, sorted by date added, most recent first
+ 
+ @see https://vk.com/dev/users.getFollowers
+ 
+ @param options parameter fields
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)followers:(NSDictionary *)options;
 
 /**
-@name Переопределенные методы
+ @name Redefinable methods
  */
-/** Описание текущего пользователя
-*/
+/** Current user description
+ */
 - (NSString *)description;
 
 @end
@@ -211,99 +182,137 @@ YES.
 @interface VKUser (Wall)
 
 /**
-@name Стена
-*/
-/** Возвращает список записей со стены пользователя или сообщества
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.get
-@return @see info
-*/
+ @name Wall Api
+ */
+/** Returns a list of posts on a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallGet:(NSDictionary *)options;
 
-/** Возвращает список записей со стен пользователей по их идентификаторам
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.getById
-@return @see info
-*/
+/** Returns a list of posts from user or community walls by their IDs.
+ 
+ @see https://vk.com/dev/wall.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallGetByID:(NSDictionary *)options;
 
-/** Сохраняет запись на стене пользователя. Запись может содержать фотографию, ранее загруженную на сервер ВКонтакте, или любую доступную фотографию из альбома пользователя.
-При запуске со стены приложение открывается в окне размером 607x412 и ему передаются параметры, описанные здесь.
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.savePost
-@return @see info
-*/
+/** Saves a post on a user wall. The post can contain a photo previously uploaded to the VK server or any available photo from one of the user's albums.
+ When run from the user wall, the application opens in a 607x412-pixel window and receives the parameters described here.
+ 
+ @see https://vk.com/dev/wall.savePost
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallSavePost:(NSDictionary *)options;
 
-/** Публикует новую запись на своей или чужой стене.
-Данный метод позволяет создать новую запись на стене, а также опубликовать предложенную новость или отложенную запись.
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.post
-@return @see info
-*/
+/** Adds a new post on a user wall or community wall. Can also be used to publish suggested or scheduled posts.
+ 
+ @see https://vk.com/dev/wall.post
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallPost:(NSDictionary *)options;
 
-/** Копирует объект на стену пользователя или сообщества
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.repost
-@return @see info
-*/
+/** Reposts (copies) an object to a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.repost
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallRepost:(NSDictionary *)options;
 
-/** Позволяет получать список репостов заданной записи
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.getReposts
-@return @see info
-*/
+/** Returns information about reposts of a post on user wall or community wall
+ 
+ @see https://vk.com/dev/wall.getReposts
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallGetReposts:(NSDictionary *)options;
 
-/** Редактирует запись на стене
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.edit
-@return @see info
-*/
+/** Edits a post on a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.edit
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallEdit:(NSDictionary *)options;
 
-/** Удаляет запись со стены
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.delete
-@return @see info
-*/
+/** Deletes a post from a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallDelete:(NSDictionary *)options;
 
-/** Восстанавливает удаленную запись на стене пользователя
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.restore
-@return @see info
-*/
+/** Restores a post deleted from a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.restore
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallRestore:(NSDictionary *)options;
 
-/** Возвращает список комментариев к записи на стене пользователя
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.getComments
-@return @see info
-*/
+/** Returns a list of comments on a post on a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.getComments
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallGetComments:(NSDictionary *)options;
 
-/** Добавляет комментарий к записи на стене пользователя или сообщества
-
-@param options ключи-значения, полный список в документации: http://vk.com/dev/wall.addComment
-@return @see info
-*/
+/** Adds a comment to a post on a user wall or community wall
+ 
+ @see http://vk.com/dev/wall.addComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallAddComment:(NSDictionary *)options;
 
-/** Удаляет комментарий текущего пользователя к записи на своей или чужой стене
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.deleteComment
-@return @see info
-*/
+/** Deletes a comment on a post on a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.deleteComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallDeleteComment:(NSDictionary *)options;
 
-/** Восстанавливает комментарий текущего пользователя к записи на своей или чужой стене
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/wall.restoreComment
-@return @see info
-*/
+/** Restores a comment deleted from a user wall or community wall
+ 
+ @see https://vk.com/dev/wall.restoreComment
+ 
+ @param options parameters list 
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)wallRestoreComment:(NSDictionary *)options;
 
 @end
@@ -311,265 +320,381 @@ YES.
 @interface VKUser (Photos)
 
 /**
-@name Фотографии
-*/
-/** Создает пустой альбом для фотографий
-
-@param options ключи-значения, полный список по ссылке: https://vk.com/dev/photos.createAlbum
-@return @see info
-*/
+ @name Photos
+ */
+/** Creates an empty photo album
+ 
+ @see https://vk.com/dev/photos.createAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosCreateAlbum:(NSDictionary *)options;
 
-/** Редактирует данные альбома для фотографий пользователя
-
-@param options ключи-значения, полный список по ссылке: https://vk.com/dev/photos.editAlbum
-@return @see info
-*/
+/** Edits album data for the user's photos.
+ 
+ @see https://vk.com/dev/photos.editAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosEditAlbum:(NSDictionary *)options;
 
-/** Возвращает список альбомов пользователя или сообщества
-
-@param options ключи-значения, полный список по ссылке: https://vk.com/dev/photos.getAlbums
-@return @see info
-*/
+/** Returns a list of a user's or community's photo albums
+ 
+ @see https://vk.com/dev/photos.getAlbums
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetAlbums:(NSDictionary *)options;
 
-/** Возвращает список фотографий в альбоме
-
-@param options ключи-значения, полный список по ссылке: https://vk.com/dev/photos.get
-@return @see info
-*/
+/** Returns a list of a user's or community's photos
+ 
+ @see https://vk.com/dev/photos.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGet:(NSDictionary *)options;
 
-/** Возвращает количество доступных альбомов пользователя
-
-@param options ключи-значения, полный список по ссылке: https://vk.com/dev/photos.getAlbumsCount
-@return @see info
-*/
+/** Returns the number of albums belonging to a user or community
+ 
+ @see https://vk.com/dev/photos.getAlbumsCount
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetAlbumsCount:(NSDictionary *)options;
 
-/** Возвращает список фотографий со страницы пользователя или сообщества
-
-@param options ключи-значения, полный список по ссылке: https://vk.com/dev/photos.getProfile
-@return @see info
-*/
+/** Returns a list of photos from a user's or community's page
+ 
+ @see https://vk.com/dev/photos.getProfile
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetProfile:(NSDictionary *)options;
 
-/** Возвращает информацию о фотографиях по их идентификаторам
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/photos.getById
-@return @see info
-*/
+/** Returns information about photos by their IDs
+ 
+ @see https://vk.com/dev/photos.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetByID:(NSDictionary *)options;
 
-/** Возвращает адрес сервера для загрузки фотографий
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getUploadServer
-@return @see info
-*/
+/** Returns the server address for photo upload.
+ When uploaded successfully, the photo can be saved with the photos.save method
+ 
+ @see https://vk.com/dev/photos.getUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetUploadServer:(NSDictionary *)options;
 
-/** Возвращает адрес сервера для загрузки фотографии на страницу пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getProfileUploadServer
-@return @see info
-*/
+/** Returns server address for photo upload onto a user's page.
+ When uploaded successfully, the photo can be saved with the photos.saveProfilePhoto method
+ 
+ @see https://vk.com/dev/photos.getProfileUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetProfileUploadServer:(NSDictionary *)options;
 
-/** Позволяет получить адрес для загрузки фотографий мультидиалогов
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getChatUploadServer
-@return @see info
-*/
+/** Returns an upload link for multichat cover pictures
+ 
+ @see https://vk.com/dev/photos.getChatUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetChatUploadServer:(NSDictionary *)options;
 
-/** Сохраняет фотографию пользователя после успешной загрузки
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.saveProfilePhoto
-@return @see info
-*/
+/** Saves a user's photo after being uploaded successfully.
+ You can get an address for photo upload with photos.getProfileUploadServer method
+ 
+ @see https://vk.com/dev/photos.saveProfilePhoto
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosSaveProfilePhoto:(NSDictionary *)options;
 
-/** Сохраняет фотографии после успешной загрузки на URI, полученный методом photos.getWallUploadServer
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.saveWallPhoto
-@return @see info
-*/
+/** Saves a photo after being uploaded successfully. URL obtained with photos.getWallUploadServer method
+ 
+ @see https://vk.com/dev/photos.saveWallPhoto
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosSaveWallPhoto:(NSDictionary *)options;
 
-/** Возвращает адрес сервера для загрузки фотографии на стену пользователя.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getWallUploadServer
-@return @see info
-*/
+/** Returns the server address for photo upload onto a user's wall.
+ When uploaded successfully, the photo can be saved using the photos.saveWallPhoto method
+ 
+ @see https://vk.com/dev/photos.getWallUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetWallUploadServer:(NSDictionary *)options;
 
-/** Возвращает адрес сервера для загрузки фотографии в личное сообщение пользователю
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getMessagesUploadServer
-@return @see info
-*/
+/** Returns the server address for photo upload in a private message for a user.
+ When uploaded successfully, the photo can be saved using the photos.saveMessagesPhoto method
+ 
+ @see https://vk.com/dev/photos.getMessagesUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetMessagesUploadServer:(NSDictionary *)options;
 
-/** Сохраняет фотографию после успешной загрузки на URI, полученный методом photos.getMessagesUploadServer
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.saveMessagesPhoto
-@return @see info
-*/
+/** Saves a photo after being successfully uploaded. URL obtained with photos.getMessagesUploadServer method
+ 
+ @see https://vk.com/dev/photos.saveMessagesPhoto
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosSaveMessagesPhoto:(NSDictionary *)options;
 
-/** Осуществляет поиск изображений по местоположению или описанию
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.search
-@return @see info
-*/
+/** Returns a list of photos by search criteria
+ 
+ @see https://vk.com/dev/photos.search
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosSearch:(NSDictionary *)options;
 
-/** Сохраняет фотографии после успешной загрузки
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.save
-@return @see info
-*/
+/** Saves photos after successful uploading
+ 
+ @see https://vk.com/dev/photos.save
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosSave:(NSDictionary *)options;
 
-/** Изменяет описание у выбранной фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.edit
-@return @see info
-*/
+/** Edits the caption of a photo
+ 
+ @see https://vk.com/dev/photos.edit
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosEdit:(NSDictionary *)options;
 
-/** Переносит фотографию из одного альбома в другой
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.move
-@return @see info
-*/
+/** Moves a photo from one album to another
+ 
+ @see https://vk.com/dev/photos.move
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosMove:(NSDictionary *)options;
 
-/** Делает фотографию обложкой альбома
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.makeCover
-@return @see info
-*/
+/** Makes a photo into an album cover
+ 
+ @see https://vk.com/dev/photos.makeCover
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosMakeCover:(NSDictionary *)options;
 
-/** Меняет порядок альбома в списке альбомов пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.reorderAlbums
-@return @see info
-*/
+/** Reorders the album in the list of user albums
+ 
+ @see https://vk.com/dev/photos.reorderAlbums
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosReorderAlbums:(NSDictionary *)options;
 
-/** Меняет порядок фотографии в списке фотографий альбома пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.reorderPhotos
-@return @see info
-*/
+/** Reorders the photo in the list of photos of the user album
+ 
+ @see https://vk.com/dev/photos.reorderPhotos
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosReorderPhotos:(NSDictionary *)options;
 
-/** Возвращает все фотографии пользователя или сообщества в антихронологическом порядке
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getAll
-@return @see info
-*/
+/** Returns a list of photos belonging to a user or community, in reverse chronological order
+ 
+ @see https://vk.com/dev/photos.getAll
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetAll:(NSDictionary *)options;
 
-/** Возвращает список фотографий, на которых отмечен пользователь
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getUserPhotos
-@return @see info
-*/
+/** Returns a list of photos in which a user is tagged
+ 
+ @see https://vk.com/dev/photos.getUserPhotos
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetUserPhotos:(NSDictionary *)options;
 
-/** Удаляет указанный альбом для фотографий у текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.deleteAlbum
-@return @see info
-*/
+/** Deletes a photo album belonging to the current user
+ 
+ @see https://vk.com/dev/photos.deleteAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosDeleteAlbum:(NSDictionary *)options;
 
-/** Удаление фотографии на сайте
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.delete
-@return @see info
-*/
+/** Deletes a photo
+ 
+ @see https://vk.com/dev/photos.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosDelete:(NSDictionary *)options;
 
-/** Подтверждает отметку на фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.confirmTag
-@return @see info
-*/
+/** Confirms a tag on a photo
+ 
+ @see https://vk.com/dev/photos.confirmTag
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosConfirmTagWithCusomOptions:(NSDictionary *)options;
 
-/** Возвращает список комментариев к фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getComments
-@return @see info
-*/
+/** Returns a list of comments on a photo
+ 
+ @see https://vk.com/dev/photos.getComments
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetComments:(NSDictionary *)options;
 
-/** Возвращает отсортированный в антихронологическом порядке список всех комментариев к конкретному альбому или ко всем альбомам пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getAllComments
-@return @see info
-*/
+/** Returns a list of comments on a specific photo album or all albums of the user sorted in reverse chronological order
+ 
+ @see https://vk.com/dev/photos.getAllComments
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetAllComments:(NSDictionary *)options;
 
-/** Создает новый комментарий к фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.createComment
-@return @see info
-*/
+/** Adds a new comment on the photo
+ 
+ @see https://vk.com/dev/photos.createComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosCreateComment:(NSDictionary *)options;
 
-/** Удаляет комментарий к фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.deleteComment
-@return @see info
-*/
+/** Deletes a comment on the photo
+ 
+ @see https://vk.com/dev/photos.deleteComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosDeleteComment:(NSDictionary *)options;
 
-/** Восстанавливает удаленный комментарий к фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.restoreComment
-@return @see info
-*/
+/** Restores a deleted comment on a photo
+ 
+ @see https://vk.com/dev/photos.restoreComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosRestoreComment:(NSDictionary *)options;
 
-/** Изменяет текст комментария к фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.editComment
-@return @see info
-*/
+/** Edits a comment on a photo
+ 
+ @see https://vk.com/dev/photos.editComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosEditComment:(NSDictionary *)options;
 
-/** Возвращает список отметок на фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getTags
-@return @see info
-*/
+/** Returns a list of tags on a photo
+ 
+ @see https://vk.com/dev/photos.getTags
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetTags:(NSDictionary *)options;
 
-/** Добавляет отметку на фотографию
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.putTag
-@return @see info
-*/
+/** Adds a tag on the photo
+ 
+ @see https://vk.com/dev/photos.putTag
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosPutTag:(NSDictionary *)options;
 
-/** Удаляет отметку с фотографии
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.removeTag
-@return @see info
-*/
+/** Removes a tag from a photo
+ 
+ @see https://vk.com/dev/photos.removeTag
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosRemoveTag:(NSDictionary *)options;
 
-/** Возвращает список фотографий, на которых есть непросмотренные отметки
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/photos.getNewTags
-@return @see info
-*/
+/** Returns a list of photos with tags that have not been viewed
+ 
+ @see https://vk.com/dev/photos.getNewTags
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)photosGetNewTags:(NSDictionary *)options;
 
 @end
@@ -577,131 +702,181 @@ YES.
 @interface VKUser (Friends)
 
 /**
-@name Друзья
-*/
-/** Возвращает список идентификаторов друзей пользователя или расширенную информацию о друзьях пользователя (при использовании параметра fields)
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.get
-@return @see info
-*/
+ @name Friends
+ */
+/** Returns a list of IDs of a user's friends or detailed information about a user's friends
+ 
+ @see https://vk.com/dev/friends.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGet:(NSDictionary *)options;
 
-/** Возвращает список идентификаторов друзей пользователя, находящихся на сайте
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getOnline
-@return @see info
-*/
+/** Returns a list of IDs of a user's friends who are online
+ 
+ @see https://vk.com/dev/friends.getOnline
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetOnline:(NSDictionary *)options;
 
-/** Возвращает список идентификаторов общих друзей между парой пользователей
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getMutual
-@return @see info
-*/
+/** Returns a list of IDs of the mutual friends of two users
+ 
+ @see https://vk.com/dev/friends.getMutual
+ 
+ @param options parameters list https://vk.com/dev/friends.getMutual
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetMutual:(NSDictionary *)options;
 
-/** Возвращает список идентификаторов недавно добавленных друзей текущего пользователя
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getRecent
-@return @see info
-*/
+/** Returns a list of IDs of the current's user recently added friends
+ 
+ @see https://vk.com/dev/friends.getRecent
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetRecent:(NSDictionary *)options;
 
-/** Возвращает информацию о полученных или отправленных заявках на добавление в друзья для текущего пользователя
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getRequests
-@return @see info
-*/
+/** Returns information about a user's incoming and outgoing friend requests
+ 
+ @see https://vk.com/dev/friends.getRequests
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetRequests:(NSDictionary *)options;
 
-/** Одобряет или создает заявку на добавление в друзья.
-
-Если идентификатор выбранного пользователя присутствует в списке заявок на добавление в друзья, полученном методом friends.getRequests, то одобряет заявку на добавление и добавляет выбранного пользователя в друзья к текущему пользователю. В противном случае создает заявку на добавление в друзья текущего пользователя к выбранному пользователю.
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.add
-@return @see info
-*/
+/** Approves or creates a friend request.
+ If the selected user ID is in the friend request list obtained using the friends.getRequests method, approves the friend request and adds the selected user to the current user's friend list. Otherwise, creates a friend request from the current user for the selected user.
+ 
+ @see https://vk.com/dev/friends.add
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsAdd:(NSDictionary *)options;
 
-/** Редактирует списки друзей для выбранного друга
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.edit
-@return @see info
-*/
+/** Edits lists of friends for the selected friend.
+ 
+ @see https://vk.com/dev/friends.edit
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsEdit:(NSDictionary *)options;
 
-/** Удаляет пользователя из списка друзей или отклоняет заявку в друзья
-
-Если идентификатор выбранного пользователя присутствует в списке заявок на добавление в друзья, полученном методом friends.getRequests, то отклоняет заявку на добавление в друзья к текущему пользователю. В противном случае удаляет выбранного пользователя из списка друзей текущего пользователя, который может быть получен методом friends.get
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.delete
-@return @see info
-*/
+/** Deletes a user from the current user's friend list or declines a friend request.
+ If the selected user ID is in the friend request list obtained using the friends.getRequests method, declines the friend request for the current user. Otherwise, deletes the selected user from the friend list of the current user obtained using the friends.get method.
+ 
+ @see https://vk.com/dev/friends.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsDelete:(NSDictionary *)options;
 
-/** Возвращает список меток друзей текущего пользователя
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getLists
-@return @see info
-*/
+/** Returns a friend tag list of the current user
+ 
+ @see https://vk.com/dev/friends.getLists
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetLists:(NSDictionary *)options;
 
-/** Создает новый список друзей у текущего пользователя
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.addList
-@return @see info
-*/
+/** Creates a new friend list for the current user
+ 
+ @see https://vk.com/dev/friends.addList
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsAddList:(NSDictionary *)options;
 
-/** Редактирует существующий список друзей текущего пользователя
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.editList
-@return @see info
-*/
+/** Edits an existing friend list of the current user
+ 
+ @see https://vk.com/dev/friends.editList
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsEditList:(NSDictionary *)options;
 
-/** Удаляет существующий список друзей текущего пользователя
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.deleteList
-@return @see info
-*/
+/** Deletes an existing friend list of the current user
+ 
+ @see https://vk.com/dev/friends.deleteList
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsDeleteList:(NSDictionary *)options;
 
-/** Возвращает список идентификаторов друзей текущего пользователя, которые установили данное приложение
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getAppUsers
-@return @see info
-*/
+/** Returns a list of IDs of the current user's friends who installed the application
+ 
+ @see https://vk.com/dev/friends.getAppUsers
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetAppUsers:(NSDictionary *)options;
 
-/** Возвращает список друзей пользователя, у которых завалидированные или указанные в профиле телефонные номера входят в заданный список.
-
-Использование данного метода возможно только если у текущего пользователя завалидирован номер мобильного телефона. Для проверки этого условия можно использовать метод users.get c параметрами uids=API_USER и fields=has_mobile, где API_USER равен идентификатору текущего пользователя.
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getByPhones
-@return @see info
-*/
+/** Returns a list of user's friends whose phone numbers, validated or specified in a profile, are in the list.
+ The method can only be used if current user's mobile phone number is validated. To check this condition you can use the users.get method with uids=API_USER and fields=has_mobile parameters where API_USER is equal to current user ID.
+ 
+ @see https://vk.com/dev/friends.getByPhones
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetByPhones:(NSDictionary *)options;
 
-/** Отмечает все входящие заявки на добавление в друзья как просмотренные
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.deleteAllRequests
-@return @see info
-*/
+/** Marks all incoming friend requests as viewed
+ 
+ @see https://vk.com/dev/friends.deleteAllRequests
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsDeleteAllRequests:(NSDictionary *)options;
 
-/** Возвращает список профилей пользователей, которые могут быть друзьями текущего пользователя.
-
-@param options ключи-значения, полный список по этой ссылке: https://vk.com/dev/friends.getSuggestions
-@return @see info
-*/
+/** Returns a list of profiles of users the current user may know.
+ For the method to return enough suggestions, method account.importContacts shall be called first.
+ 
+ @see https://vk.com/dev/friends.getSuggestions
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsGetSuggestions:(NSDictionary *)options;
 
-/** Возвращает информацию о том, добавлен ли текущий пользователь в друзья у указанных пользователей.
-
-@param options ключи-значения, полный список по ссылке: https://vk.com/dev/friends.areFriends
-@return @see info
-*/
+/** Returns information whether the current user is a friend of the specified users.
+ Also, returns information whether there is an outgoing or incoming friend request (new follower).
+ 
+ @see https://vk.com/dev/friends.areFriends
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)friendsAreFriends:(NSDictionary *)options;
 
 @end
@@ -709,83 +884,116 @@ YES.
 @interface VKUser (Groups)
 
 /**
-@name Группы
-*/
-/** Возвращает информацию о том, является ли пользователь участником сообщества
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.isMember
-@return @see info
-*/
+ @name Groups
+ */
+/** Returns information specifying whether a user is a member of a community
+ 
+ @see https://vk.com/dev/groups.isMember
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsIsMember:(NSDictionary *)options;
 
-/** Возвращает информацию о заданном сообществе или о нескольких сообществах
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.getById
-@return @see info
-*/
+/** Returns information about communities by their IDs.
+ 
+ @see https://vk.com/dev/groups.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsGetByID:(NSDictionary *)options;
 
-/** Возвращает список сообществ указанного пользователя
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.get
-@return @see info
-*/
+/** Returns a list of the communities to which a user belongs
+ 
+ @see https://vk.com/dev/groups.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsGet:(NSDictionary *)options;
 
-/** Возвращает список участников сообщества
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.getMembers
-@return @see info
-*/
+/** Returns a list of community members
+ 
+ @see https://vk.com/dev/groups.getMembers
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsGetMembers:(NSDictionary *)options;
 
-/** Данный метод позволяет вступить в группу, публичную страницу, а также подтвердить участие во встрече.
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.join
-@return @see info
-*/
+/** With this method you can join the group or public page, and also confirm your participation in an event
+ 
+ @see https://vk.com/dev/groups.join
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsJoin:(NSDictionary *)options;
 
-/** Данный метод позволяет выходить из группы, публичной страницы, или встречи
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.leave
-@return @see info
-*/
+/** With this method you can leave a group, public page, or event
+ 
+ @see https://vk.com/dev/groups.leave
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsLeave:(NSDictionary *)options;
 
-/** Осуществляет поиск сообществ по заданной подстроке
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.search
-@return @see info
-*/
+/** Searches for communities by substring
+ 
+ @see https://vk.com/dev/groups.search
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsSearch:(NSDictionary *)options;
 
-/** Данный метод возвращает список приглашений в сообщества и встречи
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.getInvites
-@return @see info
-*/
+/** Returns a list of invitations to join communities and events
+ 
+ @see https://vk.com/dev/groups.getInvites
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsGetInvites:(NSDictionary *)options;
 
-/** Добавляет пользователя в черный список группы
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.banUser
-@return @see info
-*/
+/** Adds a user to a community blacklist
+ 
+ @see https://vk.com/dev/groups.banUser
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsBanUser:(NSDictionary *)options;
 
-/** Убирает пользователя из черного списка группы
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.unbanUser
-@return @see info
-*/
+/** Deletes a user from a community blacklist
+ 
+ @see https://vk.com/dev/groups.unbanUser
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsUnbanUser:(NSDictionary *)options;
 
-/** Возвращает список забаненных пользователей
-
-@param options ключи-значения, полный список в документации: https://vk.com/dev/groups.getBanned
-@return @see info
-*/
+/** Returns a list of users on a community blacklist
+ 
+ @see https://vk.com/dev/groups.getBanned
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)groupsGetBanned:(NSDictionary *)options;
 
 @end
@@ -793,167 +1001,236 @@ YES.
 @interface VKUser (Video)
 
 /**
-@name Video
-*/
-/** Возвращает информацию о видеозаписях
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.get
-@return @see info
-*/
+ @name Video
+ */
+/** Returns detailed information about videos
+ 
+ @see https://vk.com/dev/video.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoGet:(NSDictionary *)options;
 
-/** Редактирует данные видеозаписи на странице пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.edit
-@return @see info
-*/
+/** Edits video information on a user's page
+ 
+ @see https://vk.com/dev/video.edit
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoEdit:(NSDictionary *)options;
 
-/** Добавляет видеозапись в список пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.add
-@return @see info
-*/
+/** Adds a video to user list
+ 
+ @see https://vk.com/dev/video.add
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoAdd:(NSDictionary *)options;
 
-/** Возвращает адрес сервера (необходимый для загрузки) и данные видеозаписи.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.save
-@return @see info
-*/
+/** Returns a server address (required for upload) and video data
+ 
+ @see https://vk.com/dev/video.save
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoSave:(NSDictionary *)options;
 
-/** Удаляет видеозапись со страницы пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.delete
-@return @see info
-*/
+/** Deletes a video from user's page
+ 
+ @see https://vk.com/dev/video.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoDelete:(NSDictionary *)options;
 
-/** Восстанавливает удаленную видеозапись
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.restore
-@return @see info
-*/
+/** Restores a video after being deleted
+ 
+ @see https://vk.com/dev/video.restore
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoRestore:(NSDictionary *)options;
 
-/** Возвращает список видеозаписей в соответствии с заданным критерием поиска
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.search
-@return @see info
-*/
+/**Returns a list of videos under the set search criteria
+ 
+ @see https://vk.com/dev/video.search
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoSearch:(NSDictionary *)options;
 
-/** Возвращает список видеозаписей, на которых отмечен пользователь
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.getUserVideos
-@return @see info
-*/
+/** Returns list of videos in which the user is tagged
+ 
+ @see https://vk.com/dev/video.getUserVideos
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoGetUserVideos:(NSDictionary *)options;
 
-/** Возвращает список альбомов видеозаписей пользователя или сообщества
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.getAlbums
-@return @see info
-*/
+/** Returns a list of video albums owned by the user or community
+ 
+ @see https://vk.com/dev/video.getAlbums
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoGetAlbums:(NSDictionary *)options;
 
-/** Создает пустой альбом видеозаписей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.addAlbum
-@return @see info
-*/
+/** Creates an empty album for videos
+ 
+ @see https://vk.com/dev/video.addAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoAddAlbum:(NSDictionary *)options;
 
-/** Редактирует название альбома видеозаписей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.editAlbum
-@return @see info
-*/
+/** Edits the name of a video album
+ 
+ @see https://vk.com/dev/video.editAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoEditAlbum:(NSDictionary *)options;
 
-/** Удаляет альбом видеозаписей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.deleteAlbum
-@return @see info
-*/
+/** Deletes a video album
+ 
+ @see https://vk.com/dev/video.deleteAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoDeleteAlbum:(NSDictionary *)options;
 
-/** Перемещает видеозаписи в альбом
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.moveToAlbum
-@return @see info
-*/
+/** Moves videos to an album
+ 
+ @see https://vk.com/dev/video.moveToAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoMoveToAlbum:(NSDictionary *)options;
 
-/** Возвращает список комментариев к видеозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.getComments
-@return @see info
-*/
+/** Returns a list of comments on a video
+ 
+ @see https://vk.com/dev/video.getComments
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoGetComments:(NSDictionary *)options;
 
-/** Cоздает новый комментарий к видеозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.createComment
-@return @see info
-*/
+/** Adds a new comment on the video
+ 
+ @see https://vk.com/dev/video.createComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoCreateComment:(NSDictionary *)options;
 
-/** Удаляет комментарий к видеозаписи.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.deleteComment
-@return @see info
-*/
+/** Deletes a comment on a video
+ 
+ @see https://vk.com/dev/video.deleteComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoDeleteComment:(NSDictionary *)options;
 
-/** Восстанавливает удаленный комментарий к видеозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.restoreComment
-@return @see info
-*/
+/** Restores a comment on a video
+ 
+ @see https://vk.com/dev/video.restoreComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoRestoreComment:(NSDictionary *)options;
 
-/** Изменяет текст комментария к видеозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.editComment
-@return @see info
-*/
+/** Edits the text of a comment on a video
+ 
+ @see https://vk.com/dev/video.editComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoEditComment:(NSDictionary *)options;
 
-/** Возвращает список отметок на видеозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.getTags
-@return @see info
-*/
+/** Returns a list of tags on a video
+ 
+ @see https://vk.com/dev/video.getTags
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoGetTags:(NSDictionary *)options;
 
-/** Добавляет отметку на видеозапись
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.putTag
-@return @see info
-*/
+/** Adds a tag on a video
+ 
+ @see https://vk.com/dev/video.putTag
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoPutTag:(NSDictionary *)options;
 
-/** Удаляет отметку с видеозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.removeTag
-@return @see info
-*/
+/** Removes a tag from a video
+ 
+ @see https://vk.com/dev/video.removeTag
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoRemoveTag:(NSDictionary *)options;
 
-/** Возвращает список видеозаписей, на которых есть непросмотренные отметки
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.getNewTags
-@return @see info
-*/
+/** Returns a list of videos with tags that have not been viewed
+ 
+ @see https://vk.com/dev/video.getNewTags
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoGetNewTags:(NSDictionary *)options;
 
-/** Позволяет пожаловаться на видеозапись
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/video.report
-@return @see info
-*/
+/** Allows to report a video
+ 
+ @see https://vk.com/dev/video.report
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)videoReport:(NSDictionary *)options;
 
 @end
@@ -961,153 +1238,217 @@ YES.
 @interface VKUser (Audio)
 
 /**
-@name Аудио
-*/
-/** Возвращает список аудиозаписей пользователя или сообщества
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.get
-@return @see info
-*/
+ @name Audio
+ */
+/** Returns a list of audio files of a user or community
+ 
+ @see https://vk.com/dev/audio.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGet:(NSDictionary *)options;
 
-/** Возвращает информацию об аудиозаписях
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getById
-@return @see info
-*/
+/** Returns information about audio files by their IDs
+ 
+ @see https://vk.com/dev/audio.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetByID:(NSDictionary *)options;
 
-/** Возвращает текст аудиозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getLyrics
-@return @see info
-*/
+/** Returns lyrics corresponding to an audio file.
+ The lyrics_id parameter is required for text identification and can be received using audio.get, audio.getById or audio.search method
+ 
+ @see https://vk.com/dev/audio.getLyrics
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetLyrics:(NSDictionary *)options;
 
-/** Возвращает список аудиозаписей в соответствии с заданным критерием поиска
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.search
-@return @see info
-*/
+/** Returns a list of audio files
+ 
+ @see https://vk.com/dev/audio.search
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioSearch:(NSDictionary *)options;
 
-/** Возвращает адрес сервера для загрузки аудиозаписей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getUploadServer
-@return @see info
-*/
+/** Returns server address to upload audio files
+ 
+ @see https://vk.com/dev/audio.getUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetUploadServer:(NSDictionary *)options;
 
-/** Сохраняет аудиозаписи после успешной загрузки
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.save
-@return @see info
-*/
+/** Saves audio files after successful uploading
+ 
+ @see https://vk.com/dev/audio.save
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioSave:(NSDictionary *)options;
 
-/** Копирует аудиозапись на страницу пользователя или группы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.add
-@return @see info
-*/
+/** Copies an audio file to a user page or community page
+ 
+ @see https://vk.com/dev/audio.add
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioAdd:(NSDictionary *)options;
 
-/** Удаляет аудиозапись со страницы пользователя или сообщества
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.delete
-@return @see info
-*/
+/** Deletes an audio file from a user page or community page
+ 
+ @see https://vk.com/dev/audio.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioDelete:(NSDictionary *)options;
 
-/** Редактирует данные аудиозаписи на странице пользователя или сообщества
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.edit
-@return @see info
-*/
+/** Edits an audio file on a user or community page
+ 
+ @see https://vk.com/dev/audio.edit
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioEdit:(NSDictionary *)options;
 
-/** Изменяет порядок аудиозаписи, перенося ее между аудиозаписями, идентификаторы которых переданы параметрами after и before
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.reorder
-@return @see info
-*/
+/** Reorders the audio file, placing it between audio files with IDs specified by after and before parameters
+ 
+ @see https://vk.com/dev/audio.reorder
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioReorder:(NSDictionary *)options;
 
-/** Восстанавливает аудиозапись после удаления
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.restore
-@return @see info
-*/
+/** Restores a deleted audio file
+ 
+ @see https://vk.com/dev/audio.restore
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioRestore:(NSDictionary *)options;
 
-/** Возвращает список альбомов аудиозаписей пользователя или группы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getAlbums
-@return @see info
-*/
+/** Returns a list of audio albums of a user or community
+ 
+ @see https://vk.com/dev/audio.getAlbums
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetAlbums:(NSDictionary *)options;
 
-/** Создает пустой альбом аудиозаписей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.addAlbum
-@return @see info
-*/
+/** Creates an empty audio album
+ 
+ @see https://vk.com/dev/audio.addAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioAddAlbum:(NSDictionary *)options;
 
-/** Редактирует название альбома аудиозаписей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.editAlbum
-@return @see info
-*/
+/** Edits the title of an audio album
+ 
+ @see https://vk.com/dev/audio.editAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioEditAlbum:(NSDictionary *)options;
 
-/** Удаляет альбом аудиозаписей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.deleteAlbum
-@return @see info
-*/
+/** Deletes an audio album
+ 
+ @see https://vk.com/dev/audio.deleteAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioDeleteAlbum:(NSDictionary *)options;
 
-/** Перемещает аудиозаписи в альбом
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.moveToAlbum
-@return @see info
-*/
+/** Moves audio files to an album
+ 
+ @see https://vk.com/dev/audio.moveToAlbum
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioMoveToAlbum:(NSDictionary *)options;
 
-/** Транслирует аудиозапись в статус пользователю или сообществу
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.setBroadcast
-@return @see info
-*/
+/** Activates an audio broadcast to the status of a user or community
+ 
+ @see https://vk.com/dev/audio.setBroadcast
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioSetBroadcast:(NSDictionary *)options;
 
-/** Возвращает список друзей и сообществ пользователя, которые транслируют музыку в статус
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getBroadcastList
-@return @see info
-*/
+/** Returns a list of the user's friends and communities that are broadcasting music in their status messages
+ 
+ @see https://vk.com/dev/audio.getBroadcastList
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetBroadcastList:(NSDictionary *)options;
 
-/** Возвращает список рекомендуемых аудиозаписей на основе списка воспроизведения заданного пользователя или на основе одной выбранной аудиозаписи
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getRecommendations
-@return @see info
-*/
+/** Returns a list of suggested audio files based on a user's playlist or a particular audio file
+ 
+ @see https://vk.com/dev/audio.getRecommendations
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetRecommendations:(NSDictionary *)options;
 
-/** Возвращает список аудиозаписей из раздела "Популярное"
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getPopular
-@return @see info
-*/
+/** Returns an audio list from the "Popular"
+ 
+ @see https://vk.com/dev/audio.getPopular
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetPopular:(NSDictionary *)options;
 
-/** Возвращает количество аудиозаписей пользователя или сообщества
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/audio.getCount
-@return @see info
-*/
+/** Returns the total number of audio files on a user or community page
+ 
+ @see https://vk.com/dev/audio.getCount
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)audioGetCount:(NSDictionary *)options;
 
 @end
@@ -1115,180 +1456,259 @@ YES.
 @interface VKUser (Messages)
 
 /**
-@name Сообщения
-*/
-/** Возвращает список входящих либо исходящих личных сообщений текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.get
-@return @see info
-*/
+ @name Messages
+ */
+/** Returns a list of incoming or outgoing private messages of the current user
+ 
+ @see https://vk.com/dev/messages.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGet:(NSDictionary *)options;
 
-/** Возвращает список диалогов текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getDialogs
-@return @see info
-*/
+/** Returns a list of current user's conversations
+ 
+ @see https://vk.com/dev/messages.getDialogs
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetDialogs:(NSDictionary *)options;
 
-/** Возвращает сообщения по их id
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getById
-@return @see info
-*/
+/** Returns messages by their id
+ 
+ @see https://vk.com/dev/messages.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetByID:(NSDictionary *)options;
 
-/** Возвращает список найденных личных сообщений текущего пользователя по введенной строке поиска
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.search
-@return @see info
-*/
+/** Returns a list of found private messages of the current user by filled-in search bar
+ 
+ @see https://vk.com/dev/messages.search
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesSearch:(NSDictionary *)options;
 
-/** Возвращает историю сообщений для указанного пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getHistory
-@return @see info
-*/
+/** Returns message history for the specified user or group chat
+ 
+ @see https://vk.com/dev/messages.getHistory
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetHistory:(NSDictionary *)options;
 
-/** Отправляет сообщение
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.send
-@return @see info
-*/
+/** Sends a message
+ 
+ @see https://vk.com/dev/messages.send
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesSend:(NSDictionary *)options;
 
-/** Удаляет сообщение
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.delete
-@return @see info
-*/
+/** Deletes a message
+ 
+ @see https://vk.com/dev/messages.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesDelete:(NSDictionary *)options;
 
-/** Удаляет все личные сообщения в диалоге
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.deleteDialog
-@return @see info
-*/
+/** Deletes all private messages in conversation
+ 
+ @see https://vk.com/dev/messages.deleteDialog
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesDeleteDialog:(NSDictionary *)options;
 
-/** Восстанавливает удаленное сообщение
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.restore
-@return @see info
-*/
+/** Restores deleted message
+ 
+ @see https://vk.com/dev/messages.restore
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesRestore:(NSDictionary *)options;
 
-/** Помечает сообщения как непрочитанные
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.markAsNew
-@return @see info
-*/
+/** Marks messages as unread
+ 
+ @see https://vk.com/dev/messages.markAsNew
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesMarkAsNew:(NSDictionary *)options;
 
-/** Помечает сообщения как прочитанные
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.markAsRead
-@return @see info
-*/
+/** Marks messages as read
+ 
+ @see https://vk.com/dev/messages.markAsRead
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesMarkAsRead:(NSDictionary *)options;
 
-/** Помечает сообщения как важные либо снимает отметку
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.markAsImportant
-@return @see info
-*/
+/** Marks and unmarks messages as important (starred)
+ 
+ @see https://vk.com/dev/messages.markAsImportant
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesMarkAsImportant:(NSDictionary *)options;
 
-/** Возвращает данные, необходимые для подключения к Long Poll серверу
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getLongPollServer
-*/
+/** Returns data required for connection to a Long Poll server.
+ With Long Poll connection you can immediately know about incoming messages and other events
+ 
+ @see https://vk.com/dev/messages.getLongPollServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetLongPollServer:(NSDictionary *)options;
 
-/** Возвращает обновления в личных сообщениях пользователя
-
-Для ускорения работы с личными сообщениями может быть полезно кешировать уже загруженные ранее сообщения на мобильном устройстве / ПК пользователя, чтобы не получать их повторно при каждом обращении. Этот метод помогает осуществить синхронизацию локальной копии списка сообщений с актуальной версией.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getLongPollHistory
-@return @see info
-*/
+/** Returns updates in user's private messages.
+ To speed up handling of private messages it can be useful to cache previously loaded messages on a user's mobile device/desktop, to prevent re-receipt at each call. With this method you can synchronize a local copy of the message list with the actual version.
+ 
+ @see https://vk.com/dev/messages.getLongPollHistory
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetLongPollHistory:(NSDictionary *)options;
 
-/** Возвращает информацию о беседе
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getChat
-@return @see info
-*/
+/** Returns information about a chat
+ 
+ @see https://vk.com/dev/messages.getChat
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetChat:(NSDictionary *)options;
 
-/** Создаёт беседу с несколькими участниками
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.createChat
-@return @see info
-*/
+/** Creates a chat with several participants
+ 
+ @see https://vk.com/dev/messages.createChat
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesCreateChat:(NSDictionary *)options;
 
-/** Изменяет название беседы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.editChat
-@return @see info
-*/
+/** Changes chat title
+ 
+ @see https://vk.com/dev/messages.editChat
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesEditChat:(NSDictionary *)options;
 
-/** Позволяет получить список пользователей мультидиалога по его id
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getChatUsers
-@return @see info
-*/
+/** Gets a list of multi-conversation users by its id
+ 
+ @see https://vk.com/dev/messages.getChatUsers
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetChatUsers:(NSDictionary *)options;
 
-/** Изменяет статус набора текста пользователем в диалоге
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.setActivity
-@return @see info
-*/
+/** Changes status of a user typing in conversation
+ 
+ @see https://vk.com/dev/messages.setActivity
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesSetActivity:(NSDictionary *)options;
 
-/** Возвращает список найденных диалогов текущего пользователя по введенной строке поиска
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.searchDialogs
-@return @see info
-*/
+/** Returns a list of found conversations of the current user by filled-in search bar
+ 
+ @see https://vk.com/dev/messages.searchDialogs
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesSearchDialogs:(NSDictionary *)options;
 
-/** Добавляет в мультидиалог нового пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.addChatUser
-*/
+/** Adds new user to a multi-conversation
+ 
+ @see https://vk.com/dev/messages.addChatUser
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesAddChatUser:(NSDictionary *)options;
 
-/** Исключает из мультидиалога пользователя, если текущий пользователь был создателем беседы либо пригласил исключаемого пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.removeChatUser
-*/
+/** Removes a user from the multi-conversation, if the current user was a chat starter or invited a user to be removed.
+ Also it can be used for exit of the current user from the chat he/she participates in
+ 
+ @see https://vk.com/dev/messages.removeChatUser
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesRemoveChatUser:(NSDictionary *)options;
 
-/** Возвращает текущий статус и дату последней активности указанного пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.getLastActivity
-@return @see info
-*/
+/** Returns current status and date of last activity of the specified user
+ 
+ @see https://vk.com/dev/messages.getLastActivity
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesGetLastActivity:(NSDictionary *)options;
 
-/** Позволяет установить фотографию мультидиалога, загруженную с помощью метода photos.getChatUploadServer
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.setChatPhoto
-@return @see info
-*/
+/** Sets a picture as cover picture in a multichat. To upload the picture use photos.getChatUploadServer
+ 
+ @see https://vk.com/dev/messages.setChatPhoto
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesSetChatPhoto:(NSDictionary *)options;
 
-/** Позволяет удалить фотографию мультидиалога
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/messages.deleteChatPhoto
-@return @see info
-*/
+/** Deletes a multichat cover picture
+ 
+ @see https://vk.com/dev/messages.deleteChatPhoto
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)messagesDeleteChatPhoto:(NSDictionary *)options;
 
 @end
@@ -1296,75 +1716,106 @@ YES.
 @interface VKUser (Newsfeed)
 
 /**
-@name Новости
-*/
-/** Возвращает данные, необходимые для показа списка новостей для текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.get
-@return @see info
-*/
+ @name Newsfeed
+ */
+/** Returns data required to show newsfeed for the current user
+ 
+ @see https://vk.com/dev/newsfeed.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedGet:(NSDictionary *)options;
 
-/** Получает список новостей, рекомендованных пользователю
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.getRecommended
-@return @see info
-*/
+/** Returns a list of newsfeeds recommended to the current user
+ 
+ @see https://vk.com/dev/newsfeed.getRecommended
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedGetRecommended:(NSDictionary *)options;
 
-/** Возвращает данные, необходимые для показа раздела комментариев в новостях пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.getComments
-@return @see info
-*/
+/** Returns a list of comments in the current user's newsfeed
+ 
+ @see https://vk.com/dev/newsfeed.getComments
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedGetComments:(NSDictionary *)options;
 
-/** Возвращает список записей пользователей на своих стенах, в которых упоминается указанный пользователь
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.getMentions
-@return @see info
-*/
+/** Returns a list of posts on user walls in which the current user is mentioned
+ 
+ @see https://vk.com/dev/newsfeed.getMentions
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedGetMentions:(NSDictionary *)options;
 
-/** Возвращает список пользователей и групп, которые текущий пользователь скрыл из ленты новостей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.getBanned
-@return @see info
-*/
+/** Returns a list of users and communities banned from the current user's newsfeed
+ 
+ @see https://vk.com/dev/newsfeed.getBanned
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedGetBanned:(NSDictionary *)options;
 
-/** Запрещает показывать новости от заданных пользователей и групп в ленте новостей текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.addBan
-@return @see info
-*/
+/** Prevents news from specified users and communities from appearing in the current user's newsfeed
+ 
+ @see https://vk.com/dev/newsfeed.addBan
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedAddBan:(NSDictionary *)options;
 
-/** Разрешает показывать новости от заданных пользователей и групп в ленте новостей текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.deleteBan
-@return @see info
-*/
+/** Allows news from previously banned users and communities to be shown in the current user's newsfeed
+ 
+ @see https://vk.com/dev/newsfeed.deleteBan
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedDeleteBan:(NSDictionary *)options;
 
-/** Возвращает результаты поиска по статусам
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.search
-@return @see info
-*/
+/** Returns search results by statuses
+ 
+ @see https://vk.com/dev/newsfeed.search
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedSearch:(NSDictionary *)options;
 
-/** Возвращает пользовательские списки новостей
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.getLists
-*/
+/** Returns a list of newsfeeds followed by the current user
+ 
+ @see https://vk.com/dev/newsfeed.getLists
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedGetLists:(NSDictionary *)options;
 
-/** Отписывает текущего пользователя от комментариев к заданному объекту
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/newsfeed.unsubscribe
-@return @see info
-*/
+/** Unsubscribes the current user from specified newsfeeds
+ 
+ @see https://vk.com/dev/newsfeed.unsubscribe
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)newsfeedUnsubscribe:(NSDictionary *)options;
 
 @end
@@ -1372,628 +1823,908 @@ YES.
 @interface VKUser (Likes)
 
 /**
-@name Лайки
-*/
-/** Получает список идентификаторов пользователей, которые добавили заданный объект в свой список Мне нравится.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/likes.getList
-@return @see info
-*/
+ @name Likes
+ */
+/** Returns a list of IDs of users who added the specified object to their Likes list
+ 
+ @see https://vk.com/dev/likes.getList
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)likesGetList:(NSDictionary *)options;
 
-/** Добавляет указанный объект в список Мне нравится текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/likes.add
-@return @see info
-*/
+/** Adds the specified object to the Likes list of the current user
+ 
+ @see https://vk.com/dev/likes.add
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)likesAdd:(NSDictionary *)options;
 
-/** Удаляет указанный объект из списка Мне нравится текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/likes.delete
-@return @see info
-*/
+/** Deletes the specified object from the Likes list of the current user
+ 
+ @see https://vk.com/dev/likes.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)likesDelete:(NSDictionary *)options;
 
-/** Проверяет, находится ли объект в списке Мне нравится заданного пользователя.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/likes.isLiked
-@return @see info
-*/
+/** Checks if the object is in Likes list of the specified user
+ 
+ @see https://vk.com/dev/likes.isLiked
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)likesIsLiked:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Account)
-
-/** Возвращает ненулевые значения счетчиков пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.getCounters
-@return @see info
-*/
+/**
+ * @name Account
+ */
+/** Returns non-null values of user counters
+ 
+ @see https://vk.com/dev/account.getCounters
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountGetCounters:(NSDictionary *)options;
 
-/** Устанавливает короткое название приложения (до 17 символов), которое выводится пользователю в левом меню.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.setNameInMenu
-@return @see info
-*/
+/** Sets an application screen name (up to 17 characters), that is shown to the user in the left menu.
+ This happens only in case the user added such application in the left menu from application page, from list of applications and settings
+ 
+ @see https://vk.com/dev/account.setNameInMenu
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountSetNameInMenu:(NSDictionary *)options;
 
-/** Помечает текущего пользователя как online на 15 минут.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.setOnline
-@return @see info
-*/
+/** Marks the current user as online for 15 minutes
+ 
+ @see https://vk.com/dev/account.setOnline
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountSetOnline:(NSDictionary *)options;
 
-/** Принимает список контактов пользователя для поиска зарегистрированных во ВКонтакте пользователей методом friends.getSuggestions.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.importContacts
-@return @see info
-*/
+/** Gets user's contact list to search VK-registered users with friends.getSuggestions method
+ 
+ @see https://vk.com/dev/account.importContacts
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountImportContacts:(NSDictionary *)options;
 
-/** Подписывает устройство на базе iOS, Android иди Windows Phone на получение Push-уведомлений.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.registerDevice
-@return @see info
-*/
+/** Subscribes an iOS/Android-based device to receive push notifications
+ 
+ @see https://vk.com/dev/account.registerDevice
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountRegisterDevice:(NSDictionary *)options;
 
-/** Отписывает устройство от Push уведомлений.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.unregisterDevice
-@return @see info
-*/
+/** Unsubscribes a device from push notifications
+ 
+ @see https://vk.com/dev/account.unregisterDevice
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountUnregisterDevice:(NSDictionary *)options;
 
-/** Отключает push-уведомления на заданный промежуток времени.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.setSilenceMode
-@return @see info
-*/
+/** Mutes in parameters of sent push notifications for the set period of time
+ 
+ @see https://vk.com/dev/account.setSilenceMode
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountSetSilenceMode:(NSDictionary *)options;
 
-/** Позволяет получать настройки Push уведомлений.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.getPushSettings
-@return @see info
-*/
+/** Gets settings of push notifications
+ 
+ @see https://vk.com/dev/account.getPushSettings
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountGetPushSettings:(NSDictionary *)options;
 
-/** Получает настройки текущего пользователя в данном приложении.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.getAppPermissions
-@return @see info
-*/
+/** Gets settings of the current user in this application
+ 
+ @see https://vk.com/dev/account.getAppPermissions
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountGetAppPermissions:(NSDictionary *)options;
 
-/** Возвращает список активных рекламных предложений (офферов), выполнив которые пользователь сможет получить соответствующее количество голосов на свой счёт внутри приложения.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.getActiveOffers
-@return @see info
-*/
+/** Returns a list of active ads (offers) which executed by the user will bring him/her respective number of votes to his balance in the application.
+ To show the user one or all ads you can use showLeadsPaymentBox JS API method. After the user completed one of the campaigns offer to him/her, votes will be automatically entered to user's balance in the application. In this case, the application can write off the required number of votes by converting them into the application's internal currency.
+ 
+ @see https://vk.com/dev/account.getActiveOffers
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountGetActiveOffers:(NSDictionary *)options;
 
-/** Добавляет пользователя в черный список.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.banUser
-@return @see info
-*/
+/** Adds user to the banlist
+ 
+ @see https://vk.com/dev/account.banUser
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountBanUser:(NSDictionary *)options;
 
-/** Убирает пользователя из черного списка.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.unbanUser
-@return @see info
-*/
+/** Deletes user from the banlist
+ 
+ @see https://vk.com/dev/account.unbanUser
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountUnbanUser:(NSDictionary *)options;
 
-/** Возвращает список пользователей, находящихся в черном списке.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/account.getBanned
-@return @see info
-*/
+/** Returns a user's blacklist
+ 
+ @see https://vk.com/dev/account.getBanned
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)accountGetBanned:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Status)
-
-/** Получает текст статуса пользователя или сообщества.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/status.get
-@return @see info
-*/
+/**
+ * @name Status
+ */
+/** Returns text of the status of a user or community
+ 
+ @see https://vk.com/dev/status.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)statusGet:(NSDictionary *)options;
 
-/** Устанавливает новый статус текущему пользователю.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/status.set
-@return @see info
-*/
+/** Sets a new status for the current user
+ 
+ @see https://vk.com/dev/status.set
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)statusSet:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Pages)
-
-/** Возвращает информацию о вики-странице.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/pages.get
-@return @see info
-*/
+/**
+ * @name Pages
+ */
+/** Returns information about a wiki page
+ 
+ @see https://vk.com/dev/pages.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pagesGet:(NSDictionary *)options;
 
-/** Сохраняет текст вики-страницы.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/pages.save
-@return @see info
-*/
+/** Saves the text of a wiki page
+ 
+ @see https://vk.com/dev/pages.save
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pagesSave:(NSDictionary *)options;
 
-/** Сохраняет новые настройки доступа на чтение и редактирование вики-страницы.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/pages.saveAccess
-@return @see info
-*/
+/** Saves modified read and edit access settings for a wiki page
+ 
+ @see https://vk.com/dev/pages.saveAccess
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pagesSaveAccess:(NSDictionary *)options;
 
-/** Возвращает список всех старых версий вики-страницы.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/pages.getHistory
-@return @see info
-*/
+/** Returns a list of all previous versions of a wiki page
+ 
+ @see https://vk.com/dev/pages.getHistory
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pagesGetHistory:(NSDictionary *)options;
 
-/** Возвращает список вики-страниц в группе.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/pages.getTitles
-@return @see info
-*/
+/** Returns a list of wiki pages in a group
+ 
+ @see https://vk.com/dev/pages.getTitles
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pagesGetTitles:(NSDictionary *)options;
 
-/** Возвращает текст одной из старых версий страницы.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/pages.getVersion
-@return @see info
-*/
+/** Returns the text of one of the previous versions of a wiki page
+ 
+ @see https://vk.com/dev/pages.getVersion
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pagesGetVersion:(NSDictionary *)options;
 
-/** Возвращает html-представление вики-разметки
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/pages.parseWiki
-@return @see info
-*/
+/** Returns HTML representation of the wiki markup
+ 
+ @see https://vk.com/dev/pages.parseWiki
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pagesParseWiki:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Board)
+/**
+ * @name Board
+ */
 
-/** Возвращает список тем в обсуждениях указанной группы.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.getTopics
-@return @see info
-*/
+/** Returns a list of topics within the discussion board of the specified group
+ 
+ @see https://vk.com/dev/board.getTopics
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardGetTopics:(NSDictionary *)options;
 
-/** Возвращает список сообщений в указанной теме.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.getComments
-@return @see info
-*/
+/** Returns a list of comments in the specified topic
+ 
+ @see https://vk.com/dev/board.getComments
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardGetComments:(NSDictionary *)options;
 
-/** Создает новую тему в списке обсуждений группы.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.addTopic
-@return @see info
-*/
+/** Creates a new topic in the list of the group discussion board
+ 
+ @see https://vk.com/dev/board.addTopic
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardAddTopic:(NSDictionary *)options;
 
-/** Добавляет новое сообщение в теме сообщества.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.addComment
-@return @see info
-*/
+/** Adds a new comment in the community topic
+ 
+ @see https://vk.com/dev/board.addComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardAddComment:(NSDictionary *)options;
 
-/** Удаляет тему в обсуждениях группы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.deleteTopic
-@return @see info
-*/
+/** Deletes a topic form a group board
+ 
+ @see https://vk.com/dev/board.deleteTopic
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardDeleteTopic:(NSDictionary *)options;
 
-/** Изменяет заголовок темы в списке обсуждений группы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.editTopic
-@return @see info
-*/
+/** Edits topic title in the list of the group discussion board
+ 
+ @see https://vk.com/dev/board.editTopic
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardEditTopic:(NSDictionary *)options;
 
-/** Редактирует одно из сообщений в теме группы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.editComment
-@return @see info
-*/
+/** Edits one of the comments in the group topic
+ 
+ @see https://vk.com/dev/board.editComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardEditComment:(NSDictionary *)options;
 
-/** Восстанавливает удаленное сообщение темы в обсуждениях группы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.restoreComment
-@return @see info
-*/
+/** Restores a deleted comment of the topic in the group discussion board
+ 
+ @see https://vk.com/dev/board.restoreComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardRestoreComment:(NSDictionary *)options;
 
-/** Удаляет сообщение темы в обсуждениях сообщества
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.deleteComment
-@return @see info
-*/
+/** Deletes comment in the topic of the group discussion board
+ 
+ @see https://vk.com/dev/board.deleteComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardDeleteComment:(NSDictionary *)options;
 
-/** Открывает ранее закрытую тему (в ней станет возможно оставлять новые сообщения).
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.openTopic
-@return @see info
-*/
+/** Opens a topic which was earlier closed (it will be possible to post new messages in this topic)
+ 
+ @see https://vk.com/dev/board.openTopic
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardOpenTopic:(NSDictionary *)options;
 
-/** Закрывает тему в списке обсуждений группы (в такой теме невозможно оставлять новые сообщения)
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.closeTopic
-@return @see info
-*/
+/** Closes a topic in the list of group threads (no messages can be posted in this topic)
+ 
+ @see https://vk.com/dev/board.closeTopic
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardCloseTopic:(NSDictionary *)options;
 
-/** Закрепляет тему в списке обсуждений группы (такая тема при любой сортировке выводится выше остальных)
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.fixTopic
-@return @see info
-*/
+/** Fixes a topic in the list of group threads (when sorting, this topic will always be shown in the top)
+ 
+ @see https://vk.com/dev/board.fixTopic
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardFixTopic:(NSDictionary *)options;
 
-/** Отменяет прикрепление темы в списке обсуждений группы (тема будет выводиться согласно выбранной сортировке)
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/board.unfixTopic
-@return @see info
-*/
+/** Unfixes a topic in the list of group threads (this topic will be shown in accordance with the chosen type of sorting)
+ 
+ @see https://vk.com/dev/board.unfixTopic
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)boardUnfixTopic:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Notes)
+/**
+ * @name Notes
+ */
 
-/** Возвращает список заметок, созданных пользователем.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.get
-@return @see info
-*/
+/** Returns a list of notes created by a user
+ 
+ @see https://vk.com/dev/notes.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesGet:(NSDictionary *)options;
 
-/** Возвращает заметку по её id
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.getById
-@return @see info
-*/
+/** Returns a note by its ID
+ 
+ @see https://vk.com/dev/notes.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesGetByID:(NSDictionary *)options;
 
-/** Возвращает список заметок друзей пользователя.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.getFriendsNotes
-@return @see info
-*/
+/** Returns a list of a user's friends' notes
+ 
+ @see https://vk.com/dev/notes.getFriendsNotes
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesGetFriendsNotes:(NSDictionary *)options;
 
-/** Создает новую заметку у текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.add
-@return @see info
-*/
+/** Creates a new note for the current user
+ 
+ @see https://vk.com/dev/notes.add
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesAdd:(NSDictionary *)options;
 
-/** Редактирует заметку текущего пользователя.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.edit
-@return @see info
-*/
+/** Edits a note of the current user
+ 
+ @see https://vk.com/dev/notes.edit
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesEdit:(NSDictionary *)options;
 
-/** Удаляет заметку текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.delete
-@return @see info
-*/
+/** Deletes a note of the current user
+ 
+ @see https://vk.com/dev/notes.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesDelete:(NSDictionary *)options;
 
-/** Возвращает список комментариев к заметке
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.getComments
-@return @see info
-*/
+/** Returns a list of comments on a note
+ 
+ @see https://vk.com/dev/notes.getComments
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesGetComments:(NSDictionary *)options;
 
-/** Добавляет новый комментарий к заметке
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.createComment
-@return @see info
-*/
+/** Adds a new comment on a note
+ 
+ @see https://vk.com/dev/notes.createComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesCreateComment:(NSDictionary *)options;
 
-/** Редактирует указанный комментарий у заметки
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.editComment
-@return @see info
-*/
+/** Edits a comment on a note
+ 
+ @see https://vk.com/dev/notes.editComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesEditComment:(NSDictionary *)options;
 
-/** Удаляет комментарий к заметке
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.deleteComment
-@return @see info
-*/
+/** Deletes a comment on a note
+ 
+ @see https://vk.com/dev/notes.deleteComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesDeleteComment:(NSDictionary *)options;
 
-/** Восстанавливает удалённый комментарий
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notes.restoreComment
-@return @see info
-*/
+/** Restores a deleted comment on a note
+ 
+ @see https://vk.com/dev/notes.restoreComment
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notesRestoreComment:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Places)
+/**
+ * @name Places
+ */
 
-/** Добавляет новое место в базу географических мест.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.add
-@return @see info
-*/
+/** Adds a new location into the location database.
+ Created location will be shown in search by locations only for the user who added it.
+ 
+ @see https://vk.com/dev/places.add
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesAdd:(NSDictionary *)options;
 
-/** Возвращает информацию о местах по их идентификаторам.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getById
-@return @see info
-*/
+/** Returns information about locations by their IDs.
+ 
+ @see https://vk.com/dev/places.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetByID:(NSDictionary *)options;
 
-/** Возвращает список мест, найденных по заданным условиям поиска.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.search
-@return @see info
-*/
+/** Returns a list of locations, found under the specified search criteria.
+ Locations, added by website moderators and the current user, are searched. Locations are shown in the list sorted by increase of the distance from the initial search point.
+ 
+ @see https://vk.com/dev/places.search
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesSearch:(NSDictionary *)options;
 
-/** Отмечает пользователя в указанном месте.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.checkin
-@return @see info
-*/
+/** Checks a user in at the specified location
+ 
+ @see https://vk.com/dev/places.checkin
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesCheckIn:(NSDictionary *)options;
 
-/** Возвращает список отметок пользователей в местах согласно заданным параметрам.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getCheckins
-@return @see info
-*/
+/** Returns a list of user check-ins at locations according to the set parameters
+ 
+ @see https://vk.com/dev/places.getCheckins
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetCheckins:(NSDictionary *)options;
 
-/** Возвращает список всех возможных типов мест.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getTypes
-@return @see info
-*/
+/** Returns a list of all types of locations
+ 
+ @see https://vk.com/dev/places.getTypes
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetTypes:(NSDictionary *)options;
 
-/** Возвращает список стран.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getCountries
-@return @see info
-*/
+/** Returns a list of countries
+ 
+ @see https://vk.com/dev/places.getCountries
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetContries:(NSDictionary *)options;
 
-/** Возвращает список регионов.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getRegions
-@return @see info
-*/
+/** Returns a list of regions
+ 
+ @see https://vk.com/dev/places.getRegions
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetRegions:(NSDictionary *)options;
 
-/** Возвращает информацию об улицах по их идентификаторам (id).
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getStreetById
-@return @see info
-*/
+/** Returns an information about streets by their IDs
+ 
+ @see https://vk.com/dev/places.getStreetById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetStreetByID:(NSDictionary *)options;
 
-/** Возвращает информацию о странах по их идентификаторам
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getCountryById
-@return @see info
-*/
+/** Returns information about countries by their IDs
+ 
+ @see https://vk.com/dev/places.getCountryById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetCountryByID:(NSDictionary *)options;
 
-/** Возвращает список городов.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getCities
-@return @see info
-*/
+/** Returns a list of cities
+ 
+ @see https://vk.com/dev/places.getCities
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetCities:(NSDictionary *)options;
 
-/** Возвращает информацию о городах по их идентификаторам.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/places.getCityById
-@return @see info
-*/
+/** Returns information about cities by their IDs
+ 
+ @see https://vk.com/dev/places.getCityById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)placesGetCityByID:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Polls)
-
-/** Возвращает детальную информацию об опросе по его идентификатору.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/polls.getById
-@return @see info
-*/
+/**
+ * @name Polls
+ */
+/** Returns detailed information about a poll by its ID
+ 
+ @see https://vk.com/dev/polls.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pollsGetByID:(NSDictionary *)options;
 
-/** Отдает голос текущего пользователя за выбранный вариант ответа в указанном опросе.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/polls.addVote
-@return @see info
-*/
+/** Adds the current user's vote to the selected answer in the poll
+ 
+ @see https://vk.com/dev/polls.addVote
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pollsAddVote:(NSDictionary *)options;
 
-/** Снимает голос текущего пользователя с выбранного варианта ответа в указанном опросе.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/polls.deleteVote
-@return @see info
-*/
+/** Deletes the current user's vote from the selected answer in the poll
+ 
+ @see https://vk.com/dev/polls.deleteVote
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pollsDeleteVote:(NSDictionary *)options;
 
-/** Получает список идентификаторов пользователей, которые выбрали определенные варианты ответа в опросе.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/polls.getVoters
-@return @see info
-*/
+/** Returns a list of IDs of users who selected specific answers in the poll
+ 
+ @see  https://vk.com/dev/polls.getVoters
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)pollsGetVoters:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Docs)
-
-/** Возвращает расширенную информацию о документах пользователя или сообщества.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/docs.get
-@return @see info
-*/
+/**
+ * @name Docs
+ */
+/** Returns detailed information about user or community documents
+ 
+ @see https://vk.com/dev/docs.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)docsGet:(NSDictionary *)options;
 
-/** Возвращает информацию о документах по их идентификаторам.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/docs.getById
-@return @see info
-*/
+/** Returns information about documents by their IDs
+ 
+ @see https://vk.com/dev/docs.getById
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)docsGetByID:(NSDictionary *)options;
 
-/** Возвращает адрес сервера для загрузки документов.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/docs.getUploadServer
-@return @see info
-*/
+/** Returns server address to upload documents
+ 
+ @see https://vk.com/dev/docs.getUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)docsGetUploadServer:(NSDictionary *)options;
 
-/** Возвращает адрес сервера для загрузки документов в папку Отправленные, для последующей отправки документа на стену или личным сообщением.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/docs.getWallUploadServer
-@return @see info
-*/
+/** Returns a server address to upload documents to Sent folder, so the document can be posted on the wall or sent as a private message later
+ 
+ @see https://vk.com/dev/docs.getWallUploadServer
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)docsGetWallUploadServer:(NSDictionary *)options;
 
-/** Сохраняет документ после его успешной загрузки на сервер.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/docs.save
-@return @see info
-*/
+/** Saves a document after uploading it to a server
+ 
+ @see https://vk.com/dev/docs.save
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)docsSave:(NSDictionary *)options;
 
-/** Удаляет документ пользователя или группы
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/docs.delete
-@return @see info
-*/
+/** Deletes user or community documents
+ 
+ @see https://vk.com/dev/docs.delete
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)docsDelete:(NSDictionary *)options;
 
-/** Копирует документ в документы текущего пользователя
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/docs.add
-@return @see info
-*/
+/** Copies a document to a user's document list
+ 
+ @see https://vk.com/dev/docs.add
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)docsAdd:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Fave)
+/**
+ * @name Fave
+ */
 
-/** Возвращает список пользователей, добавленных текущим пользователем в закладки.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/fave.getUsers
-@return @see info
-*/
+/** Returns a list of users who are added to Bookmarks by the current user
+ 
+ @see https://vk.com/dev/fave.getUsers
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)faveGetUsers:(NSDictionary *)options;
 
-/** Возвращает фотографии, на которых текущий пользователь поставил отметку "Мне нравится"
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/fave.getPhotos
-@return @see info
-*/
+/** Returns a list of photos marked as Liked by the current user
+ 
+ @see https://vk.com/dev/fave.getPhotos
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)faveGetPhotos:(NSDictionary *)options;
 
-/** Возвращает записи, на которых текущий пользователь поставил отметку «Мне нравится»
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/fave.getPosts
-@return @see info
-*/
+/** Returns a list of wall posts marked as Liked by the current user
+ 
+ @see https://vk.com/dev/fave.getPosts
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)faveGetPosts:(NSDictionary *)options;
 
-/** Возвращает список видеозаписей, на которых текущий пользователь поставил отметку «Мне нравится»
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/fave.getVideos
-@return @see info
-*/
+/** Returns a list of videos marked as Liked by the current user
+ 
+ @see https://vk.com/dev/fave.getVideos
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)faveGetVideos:(NSDictionary *)options;
 
-/** Возвращает ссылки, добавленные в закладки текущим пользователем.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/fave.getLinks
-@return @see info
-*/
+/** Returns a list of links who are added to Bookmarks by the current user
+ 
+ @see https://vk.com/dev/fave.getLinks
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)faveGetLinks:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Notifications)
-
-/** Возвращает список оповещений об ответах других пользователей на записи текущего пользователя.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notifications.get
-@return @see info
-*/
+/**
+ * @name Notifications
+ */
+/** Returns a list of notifications about feedback of other users to the current user's wall posts
+ 
+ @see https://vk.com/dev/notifications.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notificationsGet:(NSDictionary *)options;
 
-/** Сбрасывает счетчик непросмотренных оповещений об ответах других пользователей на записи текущего пользователя.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/notifications.markAsViewed
-@return @see info
-*/
+/** Resets the counter of new notifications about feedback of other users to the current user's entries
+ 
+ @see https://vk.com/dev/notifications.markAsViewed
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)notificationsMarkeAsViewed:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Stats)
+/**
+ * @name Stats
+ */
 
-/** Возвращает статистику сообщества или приложения.
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/stats.get
-@return @see info
-*/
+/** Returns statistics of a community or an application
+ 
+ @see https://vk.com/dev/stats.get
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)statsGet:(NSDictionary *)options;
 
 @end
 
 @interface VKUser (Search)
+/**
+ * @name Search
+ */
 
-/** Метод позволяет получить результаты быстрого поиска по произвольной подстроке
-
-@param options ключи-значения, полный список здесь: https://vk.com/dev/search.getHints
-@return @see info
-*/
+/** Returns quick search results with a random substring
+ 
+ @see https://vk.com/dev/search.getHints
+ 
+ @param options parameters list
+ @return VKRequest instance which incapsulates all required parameters for requesting
+ user information. Delayed execution and request canceling also available.
+ */
 - (VKRequest *)searchGetHints:(NSDictionary *)options;
 
 @end
