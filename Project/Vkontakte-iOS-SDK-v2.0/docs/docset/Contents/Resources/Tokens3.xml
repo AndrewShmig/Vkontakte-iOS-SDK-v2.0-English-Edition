@@ -4,8 +4,8 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/cl/VKConnector</TokenIdentifier>
-			<Abstract type="html">Класс предназначен для получения приложением доступа к пользовательской учетной
-записи и осуществления запросов к API сервиса методами GET/POST.</Abstract>
+			<Abstract type="html">This interface is intended for retrieving user profile access token and
+issuing requests for VK API using GET/POST methods</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>
 			
 			<NodeRef refid="3"/>
@@ -14,7 +14,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/setDelegate:</TokenIdentifier>
-			<Abstract type="html">Делегат VKConnector</Abstract>
+			<Abstract type="html">VKConnector delegate</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, weak, readwrite) id&lt;VKConnectorDelegate&gt; delegate</Declaration>
@@ -26,7 +26,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/delegate</TokenIdentifier>
-			<Abstract type="html">Делегат VKConnector</Abstract>
+			<Abstract type="html">VKConnector delegate</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, weak, readwrite) id&lt;VKConnectorDelegate&gt; delegate</Declaration>
@@ -38,7 +38,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instp/VKConnector/delegate</TokenIdentifier>
-			<Abstract type="html">Делегат VKConnector</Abstract>
+			<Abstract type="html">VKConnector delegate</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, weak, readwrite) id&lt;VKConnectorDelegate&gt; delegate</Declaration>
@@ -50,7 +50,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/setAppID:</TokenIdentifier>
-			<Abstract type="html">Идентификатор приложения Вконтакте</Abstract>
+			<Abstract type="html">VKontakte application identifier generated during registration process</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, strong, readonly) NSString *appID</Declaration>
@@ -62,7 +62,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/appID</TokenIdentifier>
-			<Abstract type="html">Идентификатор приложения Вконтакте</Abstract>
+			<Abstract type="html">VKontakte application identifier generated during registration process</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, strong, readonly) NSString *appID</Declaration>
@@ -74,7 +74,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instp/VKConnector/appID</TokenIdentifier>
-			<Abstract type="html">Идентификатор приложения Вконтакте</Abstract>
+			<Abstract type="html">VKontakte application identifier generated during registration process</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, strong, readonly) NSString *appID</Declaration>
@@ -86,7 +86,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/setPermissions:</TokenIdentifier>
-			<Abstract type="html">Список разрешений</Abstract>
+			<Abstract type="html">Permissions list</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, strong, readonly) NSArray *permissions</Declaration>
@@ -98,7 +98,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/permissions</TokenIdentifier>
-			<Abstract type="html">Список разрешений</Abstract>
+			<Abstract type="html">Permissions list</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, strong, readonly) NSArray *permissions</Declaration>
@@ -110,7 +110,7 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instp/VKConnector/permissions</TokenIdentifier>
-			<Abstract type="html">Список разрешений</Abstract>
+			<Abstract type="html">Permissions list</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>@property (nonatomic, strong, readonly) NSArray *permissions</Declaration>
@@ -122,8 +122,8 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/clm/VKConnector/sharedInstance</TokenIdentifier>
-			<Abstract type="html">Метод класса для получения экземпляра сиглтона.
-Если объект отсутствует, то он будет создан. Не может быть равен nil или NULL.</Abstract>
+			<Abstract type="html">Class methods for retrieving singleton instance
+If onject is missing it will be created.</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>+ (id)sharedInstance</Declaration>
@@ -135,17 +135,17 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/startWithAppID:permissons:</TokenIdentifier>
-			<Abstract type="html">Инициализирует запуск коннектора с заданными параметрами</Abstract>
+			<Abstract type="html">Initializes connection with passed parameters</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>- (void)startWithAppID:(NSString *)appID permissons:(NSArray *)permissions</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>appID</Name>
-					<Abstract type="html">Идентификатор приложения полученный при регистрации.</Abstract>
+					<Abstract type="html">VKontakte application identifier generated during registration process</Abstract>
 				</Parameter><Parameter>
 					<Name>permissions</Name>
-					<Abstract type="html">Массив доступов (разрешений), которые необходимо получить приложению.</Abstract>
+					<Abstract type="html">Array with permission flags that the application needs to request</Abstract>
 				</Parameter>
 			</Parameters>
 			
@@ -155,9 +155,8 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/VKConnector/clearCookies</TokenIdentifier>
-			<Abstract type="html">Удаляет куки, которые были получены при авторизации последним пользователем приложения.
-Может понадобиться в случае, если вы хотите, чтобы пользователь мог использовать
-несколько своих учетных записей социальной сети или для авторизации другого пользователя.</Abstract>
+			<Abstract type="html">Removes cookies that are received during the authorization process of the last application user.
+Might be needed if the user wants to use different profiles or for authorization of a different person.</Abstract>
 			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
 			<Declaration>- (void)clearCookies</Declaration>

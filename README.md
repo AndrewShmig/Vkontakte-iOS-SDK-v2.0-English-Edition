@@ -1,5 +1,6 @@
 #Vkontakte-iOS-SDK-v2
-English Version
+
+Russian version can be found here: https://github.com/AndrewShmig/Vkontakte-iOS-SDK-v2.0
 
 #License
 Copyright (c) 2013 Andrew Shmig

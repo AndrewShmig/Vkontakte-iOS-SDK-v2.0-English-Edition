@@ -132,7 +132,7 @@
 	<td class="specification-value">NSObject</td>
 </tr><tr>
 	<td class="specification-title">Declared in</td>
-	<td class="specification-value">VKConnector.h</td>
+	<td class="specification-value">VKConnector.h<br />VKRequest.h</td>
 </tr>
 						</tbody></table></div>
 					
@@ -142,8 +142,8 @@
 					<div class="section section-overview">
 						<a title="Overview" name="overview"></a>
 						<h2 class="subtitle subtitle-overview">Overview</h2>
-						<p>Протокол объявляет методы отслеживания изменения статуса токена доступа
-хранимого классом <a href="../Classes/VKConnector.html">VKConnector</a>.</p>
+						<p>This protocol defines callback methods for tracking access token
+status updates. Access token is being stored in <a href="../Classes/VKConnector.html">VKConnector</a> class.</p>
 					</div>
 					
 					
@@ -162,14 +162,14 @@
 							<li>
 	<span class="tooltip">
 		<code><a href="#//api/name/VKConnector:willShowModalView:">&ndash;&nbsp;VKConnector:willShowModalView:</a></code>
-		<span class="tooltip"><p>Метод вызывается до того, как произойдет отображение модального окна авторизации</p></span>
+		<span class="tooltip"><p>This callback will be executed before authorization modal window is shown</p></span>
 	</span>
 	
 	
 </li><li>
 	<span class="tooltip">
 		<code><a href="#//api/name/VKConnector:willHideModalView:">&ndash;&nbsp;VKConnector:willHideModalView:</a></code>
-		<span class="tooltip"><p>Метод вызывается до того, как произойдет скрытие модального окна авторизации</p></span>
+		<span class="tooltip"><p>This callback will be executed before authorization modal window is hidden</p></span>
 	</span>
 	
 	
@@ -184,25 +184,22 @@
 							<li>
 	<span class="tooltip">
 		<code><a href="#//api/name/VKConnector:accessTokenInvalidated:">&ndash;&nbsp;VKConnector:accessTokenInvalidated:</a></code>
-		<span class="tooltip"><p>Метод, вызов которого сигнализирует о том, что токен стал недействительным,
-срок его действия истёк.</p></span>
+		<span class="tooltip"><p>This callback will be executed when access token expires</p></span>
 	</span>
 	
 	
 </li><li>
 	<span class="tooltip">
 		<code><a href="#//api/name/VKConnector:accessTokenRenewalSucceeded:">&ndash;&nbsp;VKConnector:accessTokenRenewalSucceeded:</a></code>
-		<span class="tooltip"><p>Метод, вызов которого сигнализирует о том, что токен доступа успешно обновлён.</p></span>
+		<span class="tooltip"><p>This callback will be executed after successful access token renewal</p></span>
 	</span>
 	
 	
 </li><li>
 	<span class="tooltip">
 		<code><a href="#//api/name/VKConnector:accessTokenRenewalFailed:">&ndash;&nbsp;VKConnector:accessTokenRenewalFailed:</a></code>
-		<span class="tooltip"><p>Метод, вызов которого сигнализирует о том, что обновление токена доступа не
-удалось.
-Причиной ошибки может быть прерывание связи, либо пользователь отказался авторизовывать
-приложение.</p></span>
+		<span class="tooltip"><p>This callback will be executed if a token update was not successful.
+It is possible that internet connection was lost or user denied authorizing application</p></span>
 	</span>
 	
 	
@@ -217,14 +214,14 @@
 							<li>
 	<span class="tooltip">
 		<code><a href="#//api/name/VKConnector:connectionErrorOccured:">&ndash;&nbsp;VKConnector:connectionErrorOccured:</a></code>
-		<span class="tooltip"><p>Метод, вызов которого сигнализирует о том, что произошла ошибка соединения при попытке осуществить запрос</p></span>
+		<span class="tooltip"><p>This callback will be executed if a connection problem occurs during a request</p></span>
 	</span>
 	
 	
 </li><li>
 	<span class="tooltip">
 		<code><a href="#//api/name/VKConnector:parsingErrorOccured:">&ndash;&nbsp;VKConnector:parsingErrorOccured:</a></code>
-		<span class="tooltip"><p>Метод, вызов которого сигнализирует о том, что произошла ошибка при парсинге JSON ответа сервера</p></span>
+		<span class="tooltip"><p>This callback will be executed if there is an invalid json response</p></span>
 	</span>
 	
 	
@@ -252,8 +249,7 @@
 	
 	
 	<div class="method-subsection brief-description">
-		<p>Метод, вызов которого сигнализирует о том, что токен стал недействительным,
-срок его действия истёк.</p>
+		<p>This callback will be executed when access token expires</p>
 	</div>		
 	
     
@@ -267,12 +263,12 @@
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>connector</em></dt>
-			<dd><p>объект класса <a href="../Classes/VKConnector.html">VKConnector</a> отправляющий сообщение.</p></dd>
+			<dd><p>instance of <a href="../Classes/VKConnector.html">VKConnector</a> class which will send a message</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>accessToken</em></dt>
-			<dd><p>токен доступа, срок действия которого истёк.</p></dd>
+			<dd><p>expired access token</p></dd>
 		</dl>
 		
 	</div>
@@ -304,10 +300,8 @@
 	
 	
 	<div class="method-subsection brief-description">
-		<p>Метод, вызов которого сигнализирует о том, что обновление токена доступа не
-удалось.
-Причиной ошибки может быть прерывание связи, либо пользователь отказался авторизовывать
-приложение.</p>
+		<p>This callback will be executed if a token update was not successful.
+It is possible that internet connection was lost or user denied authorizing application</p>
 	</div>		
 	
     
@@ -321,12 +315,12 @@
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>connector</em></dt>
-			<dd><p>объект класса <a href="../Classes/VKConnector.html">VKConnector</a> отправляющего сообщение.</p></dd>
+			<dd><p>instance of <a href="../Classes/VKConnector.html">VKConnector</a> class which will send a message</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>accessToken</em></dt>
-			<dd><p>токен доступа (равен nil)</p></dd>
+			<dd><p>access token will be equal to nil</p></dd>
 		</dl>
 		
 	</div>
@@ -358,7 +352,7 @@
 	
 	
 	<div class="method-subsection brief-description">
-		<p>Метод, вызов которого сигнализирует о том, что токен доступа успешно обновлён.</p>
+		<p>This callback will be executed after successful access token renewal</p>
 	</div>		
 	
     
@@ -372,12 +366,12 @@
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>connector</em></dt>
-			<dd><p>объект класса <a href="../Classes/VKConnector.html">VKConnector</a> отправляющий сообщение.</p></dd>
+			<dd><p>instance of <a href="../Classes/VKConnector.html">VKConnector</a> class which will send a message</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>accessToken</em></dt>
-			<dd><p>новый токен доступа, который был получен.</p></dd>
+			<dd><p>renewed access token</p></dd>
 		</dl>
 		
 	</div>
@@ -409,7 +403,7 @@
 	
 	
 	<div class="method-subsection brief-description">
-		<p>Метод, вызов которого сигнализирует о том, что произошла ошибка соединения при попытке осуществить запрос</p>
+		<p>This callback will be executed if a connection problem occurs during a request</p>
 	</div>		
 	
     
@@ -423,12 +417,12 @@
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>connector</em></dt>
-			<dd><p>объект класса <a href="../Classes/VKConnector.html">VKConnector</a> отправляющего сообщение</p></dd>
+			<dd><p>instance of <a href="../Classes/VKConnector.html">VKConnector</a> class which will send a message</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>error</em></dt>
-			<dd><p>объект ошибки содержащий описание причины возникновения ошибки</p></dd>
+			<dd><p>object with errors description</p></dd>
 		</dl>
 		
 	</div>
@@ -460,7 +454,7 @@
 	
 	
 	<div class="method-subsection brief-description">
-		<p>Метод, вызов которого сигнализирует о том, что произошла ошибка при парсинге JSON ответа сервера</p>
+		<p>This callback will be executed if there is an invalid json response</p>
 	</div>		
 	
     
@@ -474,12 +468,12 @@
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>connector</em></dt>
-			<dd><p>объект класса <a href="../Classes/VKConnector.html">VKConnector</a> отправляющего сообщение</p></dd>
+			<dd><p>instance of <a href="../Classes/VKConnector.html">VKConnector</a> class which will send a message</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>error</em></dt>
-			<dd><p>объект ошибки содержащий описание причины возникновения ошибки</p></dd>
+			<dd><p>object with errors description</p></dd>
 		</dl>
 		
 	</div>
@@ -511,7 +505,7 @@
 	
 	
 	<div class="method-subsection brief-description">
-		<p>Метод вызывается до того, как произойдет скрытие модального окна авторизации</p>
+		<p>This callback will be executed before authorization modal window is hidden</p>
 	</div>		
 	
     
@@ -525,12 +519,12 @@
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>connector</em></dt>
-			<dd><p>объект класса <a href="../Classes/VKConnector.html">VKConnector</a> отправляющий сообщение</p></dd>
+			<dd><p>instance of <a href="../Classes/VKConnector.html">VKConnector</a> class which will send a message</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>view</em></dt>
-			<dd><p>модальное окно</p></dd>
+			<dd><p>modal window</p></dd>
 		</dl>
 		
 	</div>
@@ -562,7 +556,7 @@
 	
 	
 	<div class="method-subsection brief-description">
-		<p>Метод вызывается до того, как произойдет отображение модального окна авторизации</p>
+		<p>This callback will be executed before authorization modal window is shown</p>
 	</div>		
 	
     
@@ -576,12 +570,12 @@
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>connector</em></dt>
-			<dd><p>объект класса <a href="../Classes/VKConnector.html">VKConnector</a> отправляющий сообщение</p></dd>
+			<dd><p>instance of <a href="../Classes/VKConnector.html">VKConnector</a> class which will send a message</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>view</em></dt>
-			<dd><p>модальное окно</p></dd>
+			<dd><p>modal window</p></dd>
 		</dl>
 		
 	</div>
@@ -619,7 +613,7 @@
 				<div id="footer">
 					<hr />
 					<div class="footer-copyright">
-						<p><span class="copyright">&copy; 2013 AndrewShmig. All rights reserved. (Last updated: 2013-09-04)</span><br />
+						<p><span class="copyright">&copy; 2013 AndrewShmig. All rights reserved. (Last updated: 2013-10-11)</span><br />
 						
 						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.1 (build 858)</a>.</span></p>
 						
