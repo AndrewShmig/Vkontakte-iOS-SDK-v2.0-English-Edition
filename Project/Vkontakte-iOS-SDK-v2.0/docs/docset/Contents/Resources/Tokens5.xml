@@ -1,274 +1,420 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Tokens version="1.0">
-	<File path="Classes/VKStorage.html">
+	<File path="Classes/VKRequest.html">
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/cl/VKStorage</TokenIdentifier>
-			<Abstract type="html">Interface provides access to local storage for user access tokens and cached data. The main stored
-element is the VKStorageItem instance, which contains access token and the associated cache directory</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>
+			<TokenIdentifier>//apple_ref/occ/cl/VKRequest</TokenIdentifier>
+			<Abstract type="html">Class to perform requests to the social network Vkontakte</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>
 			
 			<NodeRef refid="5"/>
 		</Token>
 		
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/setIsEmpty:</TokenIdentifier>
-			<Abstract type="html">Is local storage empty</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/setDelegate:</TokenIdentifier>
+			<Abstract type="html">Delegate</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) BOOL isEmpty</Declaration>
+			<Declaration>@property (nonatomic, weak, readwrite) id&lt;VKRequestDelegate&gt; delegate</Declaration>
 			
 			
-			<Anchor>//api/name/isEmpty</Anchor>
+			<Anchor>//api/name/delegate</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/isEmpty</TokenIdentifier>
-			<Abstract type="html">Is local storage empty</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/delegate</TokenIdentifier>
+			<Abstract type="html">Delegate</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) BOOL isEmpty</Declaration>
+			<Declaration>@property (nonatomic, weak, readwrite) id&lt;VKRequestDelegate&gt; delegate</Declaration>
 			
 			
-			<Anchor>//api/name/isEmpty</Anchor>
+			<Anchor>//api/name/delegate</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instp/VKStorage/isEmpty</TokenIdentifier>
-			<Abstract type="html">Is local storage empty</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instp/VKRequest/delegate</TokenIdentifier>
+			<Abstract type="html">Delegate</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) BOOL isEmpty</Declaration>
+			<Declaration>@property (nonatomic, weak, readwrite) id&lt;VKRequestDelegate&gt; delegate</Declaration>
 			
 			
-			<Anchor>//api/name/isEmpty</Anchor>
+			<Anchor>//api/name/delegate</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/setCount:</TokenIdentifier>
-			<Abstract type="html">Number of elements currently saved in storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/setSignature:</TokenIdentifier>
+			<Abstract type="html">Arbitrary signature of the request. Enables you to identify the request if
+one delegate performs the process of multiple requests.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSUInteger count</Declaration>
+			<Declaration>@property (nonatomic, strong, readwrite) id signature</Declaration>
 			
 			
-			<Anchor>//api/name/count</Anchor>
+			<Anchor>//api/name/signature</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/count</TokenIdentifier>
-			<Abstract type="html">Number of elements currently saved in storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/signature</TokenIdentifier>
+			<Abstract type="html">Arbitrary signature of the request. Enables you to identify the request if
+one delegate performs the process of multiple requests.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSUInteger count</Declaration>
+			<Declaration>@property (nonatomic, strong, readwrite) id signature</Declaration>
 			
 			
-			<Anchor>//api/name/count</Anchor>
+			<Anchor>//api/name/signature</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instp/VKStorage/count</TokenIdentifier>
-			<Abstract type="html">Number of elements currently saved in storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instp/VKRequest/signature</TokenIdentifier>
+			<Abstract type="html">Arbitrary signature of the request. Enables you to identify the request if
+one delegate performs the process of multiple requests.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSUInteger count</Declaration>
+			<Declaration>@property (nonatomic, strong, readwrite) id signature</Declaration>
 			
 			
-			<Anchor>//api/name/count</Anchor>
+			<Anchor>//api/name/signature</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/setFullStoragePath:</TokenIdentifier>
-			<Abstract type="html">Full path to the main storage folder</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/setCacheLiveTime:</TokenIdentifier>
+			<Abstract type="html">Cache lifetime of the current request. By default, the cache lifetime is one hour.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSString *fullStoragePath</Declaration>
+			<Declaration>@property (nonatomic, assign, readwrite) VKCachedDataLiveTime cacheLiveTime</Declaration>
 			
 			
-			<Anchor>//api/name/fullStoragePath</Anchor>
+			<Anchor>//api/name/cacheLiveTime</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/fullStoragePath</TokenIdentifier>
-			<Abstract type="html">Full path to the main storage folder</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/cacheLiveTime</TokenIdentifier>
+			<Abstract type="html">Cache lifetime of the current request. By default, the cache lifetime is one hour.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSString *fullStoragePath</Declaration>
+			<Declaration>@property (nonatomic, assign, readwrite) VKCachedDataLiveTime cacheLiveTime</Declaration>
 			
 			
-			<Anchor>//api/name/fullStoragePath</Anchor>
+			<Anchor>//api/name/cacheLiveTime</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instp/VKStorage/fullStoragePath</TokenIdentifier>
-			<Abstract type="html">Full path to the main storage folder</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instp/VKRequest/cacheLiveTime</TokenIdentifier>
+			<Abstract type="html">Cache lifetime of the current request. By default, the cache lifetime is one hour.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSString *fullStoragePath</Declaration>
+			<Declaration>@property (nonatomic, assign, readwrite) VKCachedDataLiveTime cacheLiveTime</Declaration>
 			
 			
-			<Anchor>//api/name/fullStoragePath</Anchor>
+			<Anchor>//api/name/cacheLiveTime</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/setFullCacheStoragePath:</TokenIdentifier>
-			<Abstract type="html">Full path to the main storage cache folder</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/setOfflineMode:</TokenIdentifier>
+			<Abstract type="html">Offline request mode. In this mode, the data will be requested from the cache and returned
+even in the case of expiration (removal will not happen).
+The default mode is turned off.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSString *fullCacheStoragePath</Declaration>
+			<Declaration>@property (nonatomic, assign, readwrite) BOOL offlineMode</Declaration>
 			
 			
-			<Anchor>//api/name/fullCacheStoragePath</Anchor>
+			<Anchor>//api/name/offlineMode</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/fullCacheStoragePath</TokenIdentifier>
-			<Abstract type="html">Full path to the main storage cache folder</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/offlineMode</TokenIdentifier>
+			<Abstract type="html">Offline request mode. In this mode, the data will be requested from the cache and returned
+even in the case of expiration (removal will not happen).
+The default mode is turned off.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSString *fullCacheStoragePath</Declaration>
+			<Declaration>@property (nonatomic, assign, readwrite) BOOL offlineMode</Declaration>
 			
 			
-			<Anchor>//api/name/fullCacheStoragePath</Anchor>
+			<Anchor>//api/name/offlineMode</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instp/VKStorage/fullCacheStoragePath</TokenIdentifier>
-			<Abstract type="html">Full path to the main storage cache folder</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instp/VKRequest/offlineMode</TokenIdentifier>
+			<Abstract type="html">Offline request mode. In this mode, the data will be requested from the cache and returned
+even in the case of expiration (removal will not happen).
+The default mode is turned off.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>@property (nonatomic, readonly) NSString *fullCacheStoragePath</Declaration>
+			<Declaration>@property (nonatomic, assign, readwrite) BOOL offlineMode</Declaration>
 			
 			
-			<Anchor>//api/name/fullCacheStoragePath</Anchor>
+			<Anchor>//api/name/offlineMode</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/clm/VKStorage/sharedStorage</TokenIdentifier>
-			<Abstract type="html">Shared storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/clm/VKRequest/request:delegate:</TokenIdentifier>
+			<Abstract type="html">Creates and returns a request</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>+ (instancetype)sharedStorage</Declaration>
-			
-			<ReturnValue><Abstract type="html">VKStorage instance</Abstract></ReturnValue>
-			<Anchor>//api/name/sharedStorage</Anchor>
-            <NodeRef refid="5"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/createStorageItemForAccessToken:</TokenIdentifier>
-			<Abstract type="html">Create storage element</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
-			
-			<Declaration>- (VKStorageItem *)createStorageItemForAccessToken:(VKAccessToken *)token</Declaration>
+			<Declaration>+ (instancetype)request:(NSURLRequest *)request delegate:(id&lt;VKRequestDelegate&gt;)delegate</Declaration>
 			<Parameters>
 				<Parameter>
-					<Name>token</Name>
-					<Abstract type="html">user access token for which storage item will be created</Abstract>
+					<Name>request</Name>
+					<Abstract type="html">request that will be used as the basis</Abstract>
+				</Parameter><Parameter>
+					<Name>delegate</Name>
+					<Abstract type="html">delegate to receive notifications/messages
+the state of an object and data</Abstract>
 				</Parameter>
 			</Parameters>
-			<ReturnValue><Abstract type="html">VKStorageItem instance</Abstract></ReturnValue>
-			<Anchor>//api/name/createStorageItemForAccessToken:</Anchor>
+			<ReturnValue><Abstract type="html">an instance of the class VKRequest</Abstract></ReturnValue>
+			<Anchor>//api/name/request:delegate:</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/addItem:</TokenIdentifier>
-			<Abstract type="html">Add a new element in the storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/clm/VKRequest/requestHTTPMethod:URL:headers:body:delegate:</TokenIdentifier>
+			<Abstract type="html">Creates and returns a request</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>- (void)addItem:(VKStorageItem *)item</Declaration>
+			<Declaration>+ (instancetype)requestHTTPMethod:(NSString *)httpMethod URL:(NSURL *)url headers:(NSDictionary *)headers body:(NSData *)body delegate:(id&lt;VKRequestDelegate&gt;)delegate</Declaration>
 			<Parameters>
 				<Parameter>
-					<Name>item</Name>
-					<Abstract type="html">storage item</Abstract>
+					<Name>httpMethod</Name>
+					<Abstract type="html">GET or POST</Abstract>
+				</Parameter><Parameter>
+					<Name>url</Name>
+					<Abstract type="html">the URL that will be implemented request</Abstract>
+				</Parameter><Parameter>
+					<Name>headers</Name>
+					<Abstract type="html">request headers</Abstract>
+				</Parameter><Parameter>
+					<Name>body</Name>
+					<Abstract type="html">the body of the request</Abstract>
+				</Parameter><Parameter>
+					<Name>delegate</Name>
+					<Abstract type="html">delegate to receive notifications/messages
+the state of an object and data</Abstract>
 				</Parameter>
 			</Parameters>
-			
-			<Anchor>//api/name/addItem:</Anchor>
+			<ReturnValue><Abstract type="html">an instance of the class VKRequest</Abstract></ReturnValue>
+			<Anchor>//api/name/requestHTTPMethod:URL:headers:body:delegate:</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/removeItem:</TokenIdentifier>
-			<Abstract type="html">Remove an element from the storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/clm/VKRequest/requestMethod:options:delegate:</TokenIdentifier>
+			<Abstract type="html">Creates and returns a request</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>- (void)removeItem:(VKStorageItem *)item</Declaration>
+			<Declaration>+ (instancetype)requestMethod:(NSString *)methodName options:(NSDictionary *)options delegate:(id&lt;VKRequestDelegate&gt;)delegate</Declaration>
 			<Parameters>
 				<Parameter>
-					<Name>item</Name>
-					<Abstract type="html">storage element</Abstract>
+					<Name>methodName</Name>
+					<Abstract type="html">the name of the API method (users.get, groups.join etc)</Abstract>
+				</Parameter><Parameter>
+					<Name>options</Name>
+					<Abstract type="html">dictionary of parameters to be passed to this method</Abstract>
+				</Parameter><Parameter>
+					<Name>delegate</Name>
+					<Abstract type="html">delegate to receive notifications/messages
+the state of an object and data</Abstract>
 				</Parameter>
 			</Parameters>
-			
-			<Anchor>//api/name/removeItem:</Anchor>
+			<ReturnValue><Abstract type="html">an instance of the class VKRequest</Abstract></ReturnValue>
+			<Anchor>//api/name/requestMethod:options:delegate:</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/clean</TokenIdentifier>
-			<Abstract type="html">Remove all data from the storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/initWithRequest:</TokenIdentifier>
+			<Abstract type="html">The main methods of object initialization</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>- (void)clean</Declaration>
-			
-			
-			<Anchor>//api/name/clean</Anchor>
-            <NodeRef refid="5"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/cleanCachedData</TokenIdentifier>
-			<Abstract type="html">Remove all data from the storage cache</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
-			
-			<Declaration>- (void)cleanCachedData</Declaration>
-			
-			
-			<Anchor>//api/name/cleanCachedData</Anchor>
-            <NodeRef refid="5"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/storageItemForUserID:</TokenIdentifier>
-			<Abstract type="html">Retrieve an element from the storage by userID</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
-			
-			<Declaration>- (VKStorageItem *)storageItemForUserID:(NSUInteger)userID</Declaration>
+			<Declaration>- (instancetype)initWithRequest:(NSURLRequest *)request</Declaration>
 			<Parameters>
 				<Parameter>
-					<Name>userID</Name>
-					<Abstract type="html">user identification</Abstract>
+					<Name>request</Name>
+					<Abstract type="html">the request that will be used as the basis</Abstract>
 				</Parameter>
 			</Parameters>
-			<ReturnValue><Abstract type="html">instance of VKStorageItem or nil if there is no element in storage</Abstract></ReturnValue>
-			<Anchor>//api/name/storageItemForUserID:</Anchor>
+			<ReturnValue><Abstract type="html">an object of type VKRequest</Abstract></ReturnValue>
+			<Anchor>//api/name/initWithRequest:</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/instm/VKStorage/storageItems</TokenIdentifier>
-			<Abstract type="html">List of all elements in storage</Abstract>
-			<DeclaredIn>VKStorage.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/initWithHTTPMethod:URL:headers:body:</TokenIdentifier>
+			<Abstract type="html">The init method of the object</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<Declaration>- (NSArray *)storageItems</Declaration>
+			<Declaration>- (instancetype)initWithHTTPMethod:(NSString *)httpMethod URL:(NSURL *)url headers:(NSDictionary *)headers body:(NSData *)body</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>httpMethod</Name>
+					<Abstract type="html">GET or POST</Abstract>
+				</Parameter><Parameter>
+					<Name>url</Name>
+					<Abstract type="html">the URL that will be implemented request</Abstract>
+				</Parameter><Parameter>
+					<Name>headers</Name>
+					<Abstract type="html">request headers</Abstract>
+				</Parameter><Parameter>
+					<Name>body</Name>
+					<Abstract type="html">the body of the request</Abstract>
+				</Parameter>
+			</Parameters>
+			<ReturnValue><Abstract type="html">object type VKRequest</Abstract></ReturnValue>
+			<Anchor>//api/name/initWithHTTPMethod:URL:headers:body:</Anchor>
+            <NodeRef refid="5"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/initWithMethod:options:</TokenIdentifier>
+			<Abstract type="html">The init method of the object</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
 			
-			<ReturnValue><Abstract type="html">Array with all VKStorageItem elements in storage</Abstract></ReturnValue>
-			<Anchor>//api/name/storageItems</Anchor>
+			<Declaration>- (instancetype)initWithMethod:(NSString *)methodName options:(NSDictionary *)options</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>methodName</Name>
+					<Abstract type="html">names API method (users.get, groups.join etc)</Abstract>
+				</Parameter><Parameter>
+					<Name>options</Name>
+					<Abstract type="html">dictionary of parameters to be passed to this method</Abstract>
+				</Parameter>
+			</Parameters>
+			<ReturnValue><Abstract type="html">object class VKRequest</Abstract></ReturnValue>
+			<Anchor>//api/name/initWithMethod:options:</Anchor>
+            <NodeRef refid="5"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/start</TokenIdentifier>
+			<Abstract type="html">Start request</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)start</Declaration>
+			
+			
+			<Anchor>//api/name/start</Anchor>
+            <NodeRef refid="5"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/cancel</TokenIdentifier>
+			<Abstract type="html">Cancel request</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)cancel</Declaration>
+			
+			
+			<Anchor>//api/name/cancel</Anchor>
+            <NodeRef refid="5"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/appendAudioFile:name:field:</TokenIdentifier>
+			<Abstract type="html">Adding audio file data to the contents of the HTTP request body</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)appendAudioFile:(NSData *)file name:(NSString *)name field:(NSString *)field</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>file</Name>
+					<Abstract type="html">byte representation of an audio file</Abstract>
+				</Parameter><Parameter>
+					<Name>name</Name>
+					<Abstract type="html">the name of the audio file</Abstract>
+				</Parameter><Parameter>
+					<Name>field</Name>
+					<Abstract type="html">names the HTML field that was used to send a file</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/appendAudioFile:name:field:</Anchor>
+            <NodeRef refid="5"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/appendVideoFile:name:field:</TokenIdentifier>
+			<Abstract type="html">Adding video file data to the contents of the HTTP request body</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)appendVideoFile:(NSData *)file name:(NSString *)name field:(NSString *)field</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>file</Name>
+					<Abstract type="html">byte representation of a video file</Abstract>
+				</Parameter><Parameter>
+					<Name>name</Name>
+					<Abstract type="html">the name of the video file</Abstract>
+				</Parameter><Parameter>
+					<Name>field</Name>
+					<Abstract type="html">name of an HTML field which was used to send a file</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/appendVideoFile:name:field:</Anchor>
+            <NodeRef refid="5"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/appendDocumentFile:name:field:</TokenIdentifier>
+			<Abstract type="html">Adding document data file the contents of the HTTP request body</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)appendDocumentFile:(NSData *)file name:(NSString *)name field:(NSString *)field</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>file</Name>
+					<Abstract type="html">byte representation of the document</Abstract>
+				</Parameter><Parameter>
+					<Name>name</Name>
+					<Abstract type="html">the name of the document file</Abstract>
+				</Parameter><Parameter>
+					<Name>field</Name>
+					<Abstract type="html">name of an HTML field which was used to send a file</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/appendDocumentFile:name:field:</Anchor>
+            <NodeRef refid="5"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/VKRequest/appendImageFile:name:field:</TokenIdentifier>
+			<Abstract type="html">Add the image data to the contents of the HTTP request body</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)appendImageFile:(NSData *)file name:(NSString *)name field:(NSString *)field</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>file</Name>
+					<Abstract type="html">byte representation of the image</Abstract>
+				</Parameter><Parameter>
+					<Name>name</Name>
+					<Abstract type="html">the name of the image file</Abstract>
+				</Parameter><Parameter>
+					<Name>field</Name>
+					<Abstract type="html">name of an HTML field which was used to send a file</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/appendImageFile:name:field:</Anchor>
             <NodeRef refid="5"/>
 		</Token>
 		

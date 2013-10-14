@@ -1,155 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Tokens version="1.0">
-	<File path="Protocols/VKConnectorDelegate.html">
+	<File path="Protocols/KGModalDelegate.html">
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/intf/VKConnectorDelegate</TokenIdentifier>
-			<Abstract type="html">This protocol defines callback methods for tracking access token
-status updates. Access token is being stored in VKConnector class.</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>
+			<TokenIdentifier>//apple_ref/occ/intf/KGModalDelegate</TokenIdentifier>
+			<Abstract type="html"></Abstract>
+			<DeclaredIn>VKModal.h</DeclaredIn>
 			
 			<NodeRef refid="13"/>
 		</Token>
 		
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/intfm/VKConnectorDelegate/VKConnector:willShowModalView:</TokenIdentifier>
-			<Abstract type="html">This callback will be executed before authorization modal window is shown</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/intfm/KGModalDelegate/KGModalWillAppear:</TokenIdentifier>
+			<Abstract type="html"></Abstract>
+			<DeclaredIn>VKModal.h</DeclaredIn>			
 			
-			<Declaration>- (void)VKConnector:(VKConnector *)connector willShowModalView:(VKModal *)view</Declaration>
-			<Parameters>
-				<Parameter>
-					<Name>connector</Name>
-					<Abstract type="html">instance of VKConnector class which will send a message</Abstract>
-				</Parameter><Parameter>
-					<Name>view</Name>
-					<Abstract type="html">modal window</Abstract>
-				</Parameter>
-			</Parameters>
+			<Declaration>- (void)KGModalWillAppear:(VKModal *)kgModal</Declaration>
 			
-			<Anchor>//api/name/VKConnector:willShowModalView:</Anchor>
+			
+			<Anchor>//api/name/KGModalWillAppear:</Anchor>
             <NodeRef refid="13"/>
 		</Token>
 		
 		<Token>
-			<TokenIdentifier>//apple_ref/occ/intfm/VKConnectorDelegate/VKConnector:willHideModalView:</TokenIdentifier>
-			<Abstract type="html">This callback will be executed before authorization modal window is hidden</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>			
+			<TokenIdentifier>//apple_ref/occ/intfm/KGModalDelegate/KGModalWillDisappear:</TokenIdentifier>
+			<Abstract type="html"></Abstract>
+			<DeclaredIn>VKModal.h</DeclaredIn>			
 			
-			<Declaration>- (void)VKConnector:(VKConnector *)connector willHideModalView:(VKModal *)view</Declaration>
-			<Parameters>
-				<Parameter>
-					<Name>connector</Name>
-					<Abstract type="html">instance of VKConnector class which will send a message</Abstract>
-				</Parameter><Parameter>
-					<Name>view</Name>
-					<Abstract type="html">modal window</Abstract>
-				</Parameter>
-			</Parameters>
+			<Declaration>- (void)KGModalWillDisappear:(VKModal *)kgModal</Declaration>
 			
-			<Anchor>//api/name/VKConnector:willHideModalView:</Anchor>
-            <NodeRef refid="13"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/intfm/VKConnectorDelegate/VKConnector:accessTokenInvalidated:</TokenIdentifier>
-			<Abstract type="html">This callback will be executed when access token expires</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>			
 			
-			<Declaration>- (void)VKConnector:(VKConnector *)connector accessTokenInvalidated:(VKAccessToken *)accessToken</Declaration>
-			<Parameters>
-				<Parameter>
-					<Name>connector</Name>
-					<Abstract type="html">instance of VKConnector class which will send a message</Abstract>
-				</Parameter><Parameter>
-					<Name>accessToken</Name>
-					<Abstract type="html">expired access token</Abstract>
-				</Parameter>
-			</Parameters>
-			
-			<Anchor>//api/name/VKConnector:accessTokenInvalidated:</Anchor>
-            <NodeRef refid="13"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/intfm/VKConnectorDelegate/VKConnector:accessTokenRenewalSucceeded:</TokenIdentifier>
-			<Abstract type="html">This callback will be executed after successful access token renewal</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>			
-			
-			<Declaration>- (void)VKConnector:(VKConnector *)connector accessTokenRenewalSucceeded:(VKAccessToken *)accessToken</Declaration>
-			<Parameters>
-				<Parameter>
-					<Name>connector</Name>
-					<Abstract type="html">instance of VKConnector class which will send a message</Abstract>
-				</Parameter><Parameter>
-					<Name>accessToken</Name>
-					<Abstract type="html">renewed access token</Abstract>
-				</Parameter>
-			</Parameters>
-			
-			<Anchor>//api/name/VKConnector:accessTokenRenewalSucceeded:</Anchor>
-            <NodeRef refid="13"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/intfm/VKConnectorDelegate/VKConnector:accessTokenRenewalFailed:</TokenIdentifier>
-			<Abstract type="html">This callback will be executed if a token update was not successful.
-It is possible that internet connection was lost or user denied authorizing application</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>			
-			
-			<Declaration>- (void)VKConnector:(VKConnector *)connector accessTokenRenewalFailed:(VKAccessToken *)accessToken</Declaration>
-			<Parameters>
-				<Parameter>
-					<Name>connector</Name>
-					<Abstract type="html">instance of VKConnector class which will send a message</Abstract>
-				</Parameter><Parameter>
-					<Name>accessToken</Name>
-					<Abstract type="html">access token will be equal to nil</Abstract>
-				</Parameter>
-			</Parameters>
-			
-			<Anchor>//api/name/VKConnector:accessTokenRenewalFailed:</Anchor>
-            <NodeRef refid="13"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/intfm/VKConnectorDelegate/VKConnector:connectionErrorOccured:</TokenIdentifier>
-			<Abstract type="html">This callback will be executed if a connection problem occurs during a request</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>			
-			
-			<Declaration>- (void)VKConnector:(VKConnector *)connector connectionErrorOccured:(NSError *)error</Declaration>
-			<Parameters>
-				<Parameter>
-					<Name>connector</Name>
-					<Abstract type="html">instance of VKConnector class which will send a message</Abstract>
-				</Parameter><Parameter>
-					<Name>error</Name>
-					<Abstract type="html">object with errors description</Abstract>
-				</Parameter>
-			</Parameters>
-			
-			<Anchor>//api/name/VKConnector:connectionErrorOccured:</Anchor>
-            <NodeRef refid="13"/>
-		</Token>
-		
-		<Token>
-			<TokenIdentifier>//apple_ref/occ/intfm/VKConnectorDelegate/VKConnector:parsingErrorOccured:</TokenIdentifier>
-			<Abstract type="html">This callback will be executed if there is an invalid json response</Abstract>
-			<DeclaredIn>VKConnector.h</DeclaredIn>			
-			
-			<Declaration>- (void)VKConnector:(VKConnector *)connector parsingErrorOccured:(NSError *)error</Declaration>
-			<Parameters>
-				<Parameter>
-					<Name>connector</Name>
-					<Abstract type="html">instance of VKConnector class which will send a message</Abstract>
-				</Parameter><Parameter>
-					<Name>error</Name>
-					<Abstract type="html">object with errors description</Abstract>
-				</Parameter>
-			</Parameters>
-			
-			<Anchor>//api/name/VKConnector:parsingErrorOccured:</Anchor>
+			<Anchor>//api/name/KGModalWillDisappear:</Anchor>
             <NodeRef refid="13"/>
 		</Token>
 		

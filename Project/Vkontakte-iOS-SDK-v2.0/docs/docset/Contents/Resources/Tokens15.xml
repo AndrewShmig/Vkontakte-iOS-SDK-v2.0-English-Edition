@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Tokens version="1.0">
+	<File path="Protocols/VKRequestDelegate.html">
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intf/VKRequestDelegate</TokenIdentifier>
+			<Abstract type="html">Protocol encapsulates the basic methods for tracking status
+of the request.</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>
+			
+			<NodeRef refid="15"/>
+		</Token>
+		
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intfm/VKRequestDelegate/VKRequest:response:</TokenIdentifier>
+			<Abstract type="html">Returns the server&apos;s response in the form of Foundation object</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)VKRequest:(VKRequest *)request response:(id)response</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>request</Name>
+					<Abstract type="html">request</Abstract>
+				</Parameter><Parameter>
+					<Name>response</Name>
+					<Abstract type="html">the response from the server as a Foundation object</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/VKRequest:response:</Anchor>
+            <NodeRef refid="15"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intfm/VKRequestDelegate/VKRequest:connectionErrorOccured:</TokenIdentifier>
+			<Abstract type="html">Is called if connection error occurred</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)VKRequest:(VKRequest *)request connectionErrorOccured:(NSError *)error</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>request</Name>
+					<Abstract type="html">request</Abstract>
+				</Parameter><Parameter>
+					<Name>error</Name>
+					<Abstract type="html">error with a description of the cause of failure</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/VKRequest:connectionErrorOccured:</Anchor>
+            <NodeRef refid="15"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intfm/VKRequestDelegate/VKRequest:parsingErrorOccured:</TokenIdentifier>
+			<Abstract type="html">Is called if an error occurred parsing a server response</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)VKRequest:(VKRequest *)request parsingErrorOccured:(NSError *)error</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>request</Name>
+					<Abstract type="html">request</Abstract>
+				</Parameter><Parameter>
+					<Name>error</Name>
+					<Abstract type="html">error with a description of the causes of failure</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/VKRequest:parsingErrorOccured:</Anchor>
+            <NodeRef refid="15"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intfm/VKRequestDelegate/VKRequest:responseErrorOccured:</TokenIdentifier>
+			<Abstract type="html">Is called if there is an error in the response</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)VKRequest:(VKRequest *)request responseErrorOccured:(id)error</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>request</Name>
+					<Abstract type="html">request</Abstract>
+				</Parameter><Parameter>
+					<Name>error</Name>
+					<Abstract type="html">server response with error description</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/VKRequest:responseErrorOccured:</Anchor>
+            <NodeRef refid="15"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intfm/VKRequestDelegate/VKRequest:captchaSid:captchaImage:</TokenIdentifier>
+			<Abstract type="html">Is called if you want to enter captcha</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)VKRequest:(VKRequest *)request captchaSid:(NSString *)captchaSid captchaImage:(NSString *)captchaImage</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>request</Name>
+					<Abstract type="html">request</Abstract>
+				</Parameter><Parameter>
+					<Name>captchaSid</Name>
+					<Abstract type="html">ID of a captcha</Abstract>
+				</Parameter><Parameter>
+					<Name>captchaImage</Name>
+					<Abstract type="html">link to the image you want to show the user that he enters text from</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/VKRequest:captchaSid:captchaImage:</Anchor>
+            <NodeRef refid="15"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intfm/VKRequestDelegate/VKRequest:totalBytes:downloadedBytes:</TokenIdentifier>
+			<Abstract type="html">Called every time a new portion of data (method convenient
+use to display the status of loading data)</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)VKRequest:(VKRequest *)request totalBytes:(NSUInteger)totalBytes downloadedBytes:(NSUInteger)downloadedBytes</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>request</Name>
+					<Abstract type="html">request</Abstract>
+				</Parameter><Parameter>
+					<Name>totalBytes</Name>
+					<Abstract type="html">the total number of bytes to retrieve. If for some
+reasons cannot be determined, this number will be transferred to 0</Abstract>
+				</Parameter><Parameter>
+					<Name>downloadedBytes</Name>
+					<Abstract type="html">number of loaded bytes</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/VKRequest:totalBytes:downloadedBytes:</Anchor>
+            <NodeRef refid="15"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/intfm/VKRequestDelegate/VKRequest:totalBytes:uploadedBytes:</TokenIdentifier>
+			<Abstract type="html">Called every time sent a fresh batch of data (method convenient
+use to display the status of the send data, whether it uploads audio file,
+video file or document)</Abstract>
+			<DeclaredIn>VKRequest.h</DeclaredIn>			
+			
+			<Declaration>- (void)VKRequest:(VKRequest *)request totalBytes:(NSUInteger)totalBytes uploadedBytes:(NSUInteger)uploadedBytes</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>request</Name>
+					<Abstract type="html">request</Abstract>
+				</Parameter><Parameter>
+					<Name>totalBytes</Name>
+					<Abstract type="html">the total number of bytes to retrieve. If for some
+reasons cannot be determined, this number will be transferred to 0</Abstract>
+				</Parameter><Parameter>
+					<Name>uploadedBytes</Name>
+					<Abstract type="html">number of loaded bytes</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/VKRequest:totalBytes:uploadedBytes:</Anchor>
+            <NodeRef refid="15"/>
+		</Token>
+		
+	</File>
+</Tokens>
