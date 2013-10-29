@@ -80,6 +80,13 @@
     if (nil == _mainView) {
         // настраиваем попап окно для отображения UIWebView
         CGRect frame = [[UIScreen mainScreen] bounds];
+        if (frame.size.width < frame.size.height) {
+            frame = CGRectMake(frame.origin.y, frame.origin.x, frame.size.height, frame.size.width);
+        }
+        else {
+            frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+        }
+            
         frame.size.height -= MARGIN_HEIGHT;
         frame.size.width -= MARGIN_WIDTH;
         _mainView = [[UIView alloc] initWithFrame:frame];
